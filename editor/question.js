@@ -379,7 +379,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 
     ctrl.sendMetaData = function () {
       // body...
-      var formScope = $("#content-meta-form");
+      var formScope = $("#questionMetaDataTemplate #content-meta-form");
       var frmScope = formScope.scope().metaForm;
       ecEditor.dispatchEvent("metadata:form:onsuccess", {form: frmScope});
     }
