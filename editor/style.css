@@ -169,6 +169,7 @@ color: white;
 .replyIcon {
     float: right;
     display: inline-block;
+    cursor: pointer;
 }
 
 .iframe-preview {
