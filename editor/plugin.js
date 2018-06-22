@@ -45,3 +45,5 @@ org.ekstep.question.EditorPlugin = org.ekstep.contenteditor.basePlugin.extend({
     });
   }
 });
+
+//# sourceURL=questionEditorPlugin.js

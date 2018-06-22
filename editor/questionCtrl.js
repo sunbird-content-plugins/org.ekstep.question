@@ -30,7 +30,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 			}
 		});
 		if (!ecEditor._.isEmpty(questionData)) {
-      $scope.showQuestionForm();
+      	$scope.showQuestionForm(questionData);
     } else {
       $scope.showTemplates();
     }
@@ -115,6 +115,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 			"version": obj.ver,
 			"templateId": obj.editor.template
 		};
+		var pluginInstance = $scope.createPluginInstance(obj.pluginID);
+		pluginInstance.__proto__.__proto__._data = {};
 		$scope.unitPlugin = obj.pluginID;
 		$scope.pluginVer = obj.ver;
 		$scope.templateId = obj.editor.template;
@@ -125,14 +127,17 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		$scope.refreshPreview = false;
     $scope.validateQuestionCreationForm();
   }
+  $scope.createPluginInstance = function(pluginId){
+  	return ecEditor.instantiatePlugin(pluginId);
+  }
   $scope.validateQuestionCreationForm = function(){
-  	var pluginInstance = ecEditor.instantiatePlugin($scope.selectedTemplatePluginData.plugin.id); // Plugin id is based on template choosen
+  	var pluginInstance = $scope.createPluginInstance($scope.selectedTemplatePluginData.plugin.id); // Plugin id is based on template choosen
     pluginInstance.validateForm($scope.validatedForm);
   }
 
   $scope.validatedForm = function(isFormValid){
   	if(isFormValid){
-  		var pluginInstance = ecEditor.instantiatePlugin($scope.selectedTemplatePluginData.plugin.id);
+  		var pluginInstance = $scope.createPluginInstance($scope.selectedTemplatePluginData.plugin.id);
   		$scope.questionCreationFormData = pluginInstance.__proto__.__proto__._data;
   		$scope.setPreviewData();
   		if (!$scope.refreshPreview) {
@@ -164,7 +169,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       return pi.manifest.id === $scope._constants.previewPlugin
     });
     if (_.isUndefined(previewInstance)) {
-      previewInstance = ecEditor.instantiatePlugin($scope._constants.previewPlugin);
+      previewInstance = $scope.createPluginInstance($scope._constants.previewPlugin);
     }
     confData.contentBody = previewInstance.getQuestionPreviwContent(data[$scope._constants.questionsetPlugin]);
     ecEditor.dispatchEvent("atpreview:show", confData);
@@ -324,7 +329,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       }
     });
   }
-  $scope.showQuestionForm = function () {
+  $scope.showQuestionForm = function (qData) {
     $scope.templatesScreen = false;
     $scope.questionMetadataScreen = false;
     $scope.editMode = true;
@@ -350,7 +355,6 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     $scope.questionData.questionDesc = questionData1.data.config.metadata.description;
     $scope.questionData.questionMaxScore = questionData1.data.config.metadata.max_score;
     $scope.conceptsCheck = true;
-    $scope.questionEditData = questionData1.data; //Using this variable in question unit plugin for editing question
     var pluginID = questionData1.data.plugin.id;
     var pluginVer = questionData1.data.plugin.version;
     var pluginTemplateId = questionData1.data.plugin.templateId;
@@ -361,12 +365,14 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
         $scope.questionUnitTemplateURL = templatePathEdit;
       }
     });
-
     $scope.selectedTemplatePluginData.plugin = { // Question Unit Plugin Information
       "id": pluginID, // Id of plugin
       "version": pluginVer, // Version of plugin
       "templateId": pluginTemplateId // Template Id of the question unit
     };
+    //Set question form data in edit mode
+  	var pluginInstance = $scope.createPluginInstance(questionData1.data.plugin.id);
+  	pluginInstance.renderForm(questionData1.data);
     $scope.$safeApply();
   };
   $scope.extractHTML = function(htmlElement) {
@@ -404,4 +410,5 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   }
   $scope.init();
 }]);
-//# sourceURL=question$scope.js
+
+//# sourceURL=questionCtrl.js
