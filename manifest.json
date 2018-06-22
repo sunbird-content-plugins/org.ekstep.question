@@ -14,7 +14,7 @@
       },
       {
         "type": "js",
-        "src": "editor/questionCtrl.js"
+        "src": "editor/question-ctrl.js"
       },
       {
         "type": "plugin",
