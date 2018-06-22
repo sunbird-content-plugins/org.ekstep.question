@@ -266,3 +266,7 @@ color: white;
 .formDiv{
     overflow: auto;
 }
+
+.pull-left{
+    float: left;
+}

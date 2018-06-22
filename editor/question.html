@@ -102,6 +102,15 @@
                         <div class="preview-heading">
                             <h3 class="ui left floated previewHeading">Configuration</h3>
                         </div>
+                        <div class="pull-left" ng-show="$ctrl.selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.mtf'">
+                            <label class="qcMetadateFormLbl">
+                                Select layout <span class="star">&nbsp;*</span>
+                            </label>
+                            <select class="ui dropdown form-control" name="templateType"
+                                    ng-model="$ctrl.questionData.templateType" ng-change="$ctrl.updatePreview();"  ng-click="$ctrl.generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
+                                <option ng-repeat="tem in $ctrl.templatesType" value="{{tem}}">{{tem}}</option>
+                            </select>
+                        </div>
                         <div class="ui label qb-toggle-label">Partial Scoring</div>
                         <div class="ui fluid toggle checkbox verticalcenter">
                             <input type="checkbox" ng-model="$ctrl.questionData.isPartialScore">
