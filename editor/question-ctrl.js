@@ -14,8 +14,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		previewPlugin: 'org.ekstep.questionset.preview',
 		questionPlugin: 'org.ekstep.question',
 		questionsetPlugin: 'org.ekstep.questionset',
-		questionbankPlugin: 'org.ekstep.questionbank',
-		questionunitPlugin: 'org.ekstep.questionunit'
+		questionbankPlugin: 'org.ekstep.questionbank'
 	};
 	$scope.questionData = {'questionMaxScore': 1};
 	$scope.questionData.isShuffleOption = false;
