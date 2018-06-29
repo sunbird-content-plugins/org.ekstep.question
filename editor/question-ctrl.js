@@ -179,7 +179,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     if ($scope.questionMetaData.concepts) {
     	$scope.questionMetaData.conceptData = "(" + $scope.questionData.concepts.length + ") concepts selected";
     }
-    ecEditor.dispatchEvent('org.ekstep.editcontentmeta:showpopup1', {
+    ecEditor.dispatchEvent('org.ekstep.editcontentmeta:showpopup', {
     	action: 'question-meta-save',
     	subType: 'questions',
     	framework: ecEditor.getContext('framework'),
