@@ -3,6 +3,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.templatesScreen = true;
 	$scope.questionMetadataScreen = false;
 	$scope.Totalconcepts = 0;
+	$scope.Totaltopics = 0;
 	$scope.category = '';
 	$scope.editState = false;
 	$scope.questionUnitTemplateURL = '';
@@ -34,7 +35,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 			$scope.showTemplates();
 		}
 		EventBus.listeners['editor:form:data'] = undefined;
-		ecEditor.addEventListener('editor:form:data', $scope.saveMetaData);
+		ecEditor.addEventListener('editor:form:success', $scope.saveMetaData);
 	}
 	$scope.showTemplates = function() {
 		$scope.templatesScreen = true;
@@ -155,6 +156,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   		$scope.questionData.questionMaxScore = metaFormScope.contentMeta.max_score;
   		$scope.questionData.qcGrade = metaFormScope.contentMeta.gradeLevel;
   		$scope.questionData.concepts = metaFormScope.contentMeta.concepts;
+  		$scope.questionData.topic = metaFormScope.contentMeta.topic;
   		$scope.questionMetadataScreen = false;
   	}
   }
@@ -174,10 +176,14 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     $scope.questionMetaData.max_score = $scope.questionData.questionMaxScore;
     $scope.questionMetaData.gradeLevel = $scope.questionData.qcGrade;
     $scope.questionMetaData.concepts = $scope.questionData.concepts;
+    $scope.questionMetaData.topic = $scope.questionData.topic;
     $scope.questionMetaData.subject = $scope.questionData.subject;
     $scope.questionMetaData.board = $scope.questionData.board;
     if ($scope.questionMetaData.concepts) {
     	$scope.questionMetaData.conceptData = "(" + $scope.questionData.concepts.length + ") concepts selected";
+    }
+    if ($scope.questionMetaData.topic) {
+      $scope.questionMetaData.topicData = "(" + $scope.questionData.topic.length + ") topics selected";
     }
     ecEditor.dispatchEvent('org.ekstep.editcontentmeta:showpopup', {
     	action: 'question-meta-save',
@@ -190,7 +196,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     });
   }
   $scope.sendMetaData = function () {
-  	var formElement = $("#questionMetaDataTemplate").find("#content-meta-form");
+  	var formElement = $("#questionMetadataTemplate").find("#content-meta-form");
   	var frmScope = formElement.scope();
   	ecEditor.dispatchEvent("metadata:form:onsuccess", {form: frmScope.metaForm});
   };
@@ -204,8 +210,15 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	var questionFormData = {};
     var data = {}; // TODO: You have to get this from Q.Unit plugin(getData())
     data.plugin = $scope.selectedTemplatePluginData.plugin;
-    data.data = $scope.questionCreationFormData; 
-    var metadataObj = { category: $scope.category, title:  $scope.questionMetaData.name, medium: $scope.questionMetaData.medium, qlevel:  $scope.questionMetaData.level, gradeLevel:  $scope.questionMetaData.gradeLevel, concepts:  $scope.questionMetaData.concepts, description:  $scope.questionMetaData.description, max_score:  $scope.questionMetaData.max_score, subject:  $scope.questionMetaData.subject, board:  $scope.questionMetaData.board  };
+    data.data = $scope.questionCreationFormData;
+    var outRelations = [];
+    _.each($scope.questionMetaData.concepts, function(concept){
+      outRelations.push({
+        "endNodeId": concept.identifier,
+        "relationType": "associatedTo"
+      })
+    });
+    var metadataObj = { category: $scope.category, title:  $scope.questionMetaData.name, medium: $scope.questionMetaData.medium, qlevel:  $scope.questionMetaData.level, gradeLevel:  $scope.questionMetaData.gradeLevel, concepts:  outRelations, topic:  $scope.questionMetaData.topic, description:  $scope.questionMetaData.description, max_score:  $scope.questionMetaData.max_score, subject:  $scope.questionMetaData.subject, board:  $scope.questionMetaData.board  };
     data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": $scope.questionCreationFormData.questionCount};
     data.media = $scope.questionCreationFormData.media;
     questionFormData.data = data;
@@ -230,6 +243,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       "type": $scope.category.toLowerCase(), // backward compatibility
       "template": "NA", // backward compatibility
       "template_id": "NA", // backward compatibility
+      "topic":  $scope.questionMetaData.topic,
+      //"framework": "NCFCOPY"
+      "framework": ecEditor.getContext('framework')
     };
     var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
     var mtfoptions = [{
@@ -263,7 +279,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     	"request": {
     		"assessment_item": {
     			"objectType": "AssessmentItem",
-    			"metadata": metadata
+    			"metadata": metadata,
+          "outRelations": outRelations
     		}
     	}
     };
@@ -306,11 +323,17 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	if (questionData1.data.config.metadata.concepts) {
   		$scope.Totalconcepts = questionData1.data.config.metadata.concepts.length;
   	}
-  	$scope.questionData.concepts = questionData1.data.config.metadata.concepts;
-  	$scope.selectedConceptsData = questionData1.data.config.metadata.concepts;
+    if (questionData1.data.config.metadata.topic) {
+      $scope.Totaltopics = questionData1.data.config.metadata.topic.length;
+    }
+    $scope.questionData.concepts = questionData1.data.config.metadata.concepts;
+  	$scope.questionData.topic = questionData1.data.config.metadata.topic;
+    $scope.selectedConceptsData = questionData1.data.config.metadata.concepts;
+  	$scope.selectedTopicsData = questionData1.data.config.metadata.topic;
   	$scope.questionData.questionDesc = questionData1.data.config.metadata.description;
   	$scope.questionData.questionMaxScore = questionData1.data.config.metadata.max_score;
   	$scope.conceptsCheck = true;
+  	$scope.topicsCheck = true;
   	var pluginID = questionData1.data.plugin.id;
   	var pluginVer = questionData1.data.plugin.version;
   	var pluginTemplateId = questionData1.data.plugin.templateId;
