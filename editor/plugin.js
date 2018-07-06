@@ -16,7 +16,7 @@ org.ekstep.question.EditorPlugin = org.ekstep.contenteditor.basePlugin.extend({
     var instance = this;
     ecEditor.addEventListener("org.ekstep.question:showpopup", this.loadHtml, this);
     var templatePath = ecEditor.resolvePluginResource(instance.manifest.id, instance.manifest.ver, 'editor/question.html');
-    var controllerPath = ecEditor.resolvePluginResource(instance.manifest.id, instance.manifest.ver, 'editor/question.js');
+    var controllerPath = ecEditor.resolvePluginResource(instance.manifest.id, instance.manifest.ver, 'editor/question-ctrl.js');
     ecEditor.getService(ServiceConstants.POPUP_SERVICE).loadNgModules(templatePath, controllerPath);
   },
   /**
@@ -45,3 +45,5 @@ org.ekstep.question.EditorPlugin = org.ekstep.contenteditor.basePlugin.extend({
     });
   }
 });
+
+//# sourceURL=questionEditorPlugin.js
