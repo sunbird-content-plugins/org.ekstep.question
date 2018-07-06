@@ -35,7 +35,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		}
 		EventBus.listeners['editor:form:data'] = undefined;
 		ecEditor.addEventListener('editor:form:data', $scope.saveMetaData);
-	}
+	};
 	$scope.showTemplates = function() {
 		$scope.templatesScreen = true;
 		$scope.questionMetadataScreen = false;
@@ -60,7 +60,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       }
     });
     $scope.$safeApply();
-	}
+	};
 	$scope.showQuestionUnitForm = function (obj) {
 		$scope.category = obj.category;
 		$scope.templatesScreen = false;
@@ -72,7 +72,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 			"templateId": obj.editor.template
 		};
 		var pluginInstance = $scope.createPluginInstance(obj.pluginID);
-		pluginInstance.__proto__.__proto__._data = {};
+		pluginInstance._data = {};
 		$scope.unitPlugin = obj.pluginID;
 		$scope.pluginVer = obj.ver;
 		$scope.templateId = obj.editor.template;
@@ -94,7 +94,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   $scope.validatedForm = function(isFormValid){
   	if(isFormValid){
   		var pluginInstance = $scope.createPluginInstance($scope.selectedTemplatePluginData.plugin.id);
-  		$scope.questionCreationFormData = pluginInstance.__proto__.__proto__._data;
+  		$scope.questionCreationFormData = pluginInstance._data;
   		$scope.setPreviewData();
   		if (!$scope.refreshPreview) {
   			$scope.formIsValid();
