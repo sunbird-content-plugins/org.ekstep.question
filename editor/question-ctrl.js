@@ -25,6 +25,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.init = function () {
 		ecEditor.addEventListener('editor:template:loaded', function (event, object) {
 			if(object.formAction == 'question-meta-save') {
+        ecEditor.dispatchEvent('metadata:controller:init');
 				$scope.metadataform = object.templatePath;
 			}
 		});
