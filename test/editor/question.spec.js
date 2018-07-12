@@ -1,5 +1,5 @@
 describe("EditorPlugin", function() {
-  var plugin, ctrl, $controller, $window, $scope, metaService, assessmentService, mcqPlugin, ftbPlugin, mtfPlugin;
+  var plugin, $controller, $window, $scope, metaService, assessmentService, mcqPlugin, ftbPlugin, mtfPlugin;
 
   beforeEach(module('org.ekstep.question'));
 
@@ -17,6 +17,19 @@ describe("EditorPlugin", function() {
         done();
       });
     }, 2000);
+    spyOn(ecEditor,"instantiatePlugin").and.callFake(function(pluginId){
+      if (pluginId === "org.ekstep.question") {
+        return plugin.manifest;
+      } else if (pluginId === "org.ekstep.questionunit.mcq") {
+        return mcqPlugin;
+      } else if (pluginId === "org.ekstep.questionunit.ftb") {
+        return ftbPlugin;
+      } else if (pluginId === "org.ekstep.questionunit.mtf") {
+        return mtfPlugin;
+      } else {
+        return {};
+      }
+    });
 
     metaService = jasmine.createSpyObj("meta", ["getConfigOrdinals"]);
     assessmentService = jasmine.createSpyObj("assessment", ["saveQuestionV3", "getQuestionunitPlugins"]);
@@ -61,18 +74,18 @@ describe("EditorPlugin", function() {
     beforeEach(function() {
       ctrl = $controller('QuestionCreationFormController', { $scope: $scope, instance: plugin, questionData: {} });
       var window = $window;
-      spyOn(ctrl, "showTemplates").and.callThrough();
-      spyOn(ctrl, "setPreviewData").and.callThrough();
-      spyOn(ctrl, "showPreview").and.callThrough();
+      spyOn($scope, "showTemplates").and.callThrough();
+      spyOn($scope, "setPreviewData").and.callThrough();
+      spyOn($scope, "showPreview").and.callThrough();
       spyOn(ecEditor, "dispatchEvent").and.callThrough();
-      spyOn(ctrl, "addCreateQuestionForm").and.callThrough();
-      spyOn(ctrl, "validateQuestionCreationForm").and.callThrough();
+      spyOn($scope, "validateQuestionCreationForm").and.callThrough();
+      spyOn($scope, "createPluginInstance").and.callThrough();
       spyOn(ecEditor, 'resolvePluginResource').and.callFake(function(id) {
         if (id == "org.ekstep.questionunit.mcq") {
           return "/plugins/org.ekstep.questionunit.mcq-1.0/editor/templates/horizontal_template.html"
         }
       });
-      spyOn(ctrl, 'saveQuestion').and.callThrough();
+      spyOn($scope, 'saveQuestion').and.callThrough();
       value = { "id": "horizontalMCQ", "thumbnail": "editor/assets/mcq-horizontal.png", "title": "Multiple Choice Question", "disc": "Multiple choice items consist of a stem, the correct answer, keyed alternative, and distractors. The stem is the beginning part of the item that presents the item as a problem to be solved, a question asked of the respondent, or an incomplete statement to be completed, as well as any other relevant information.", "category": "MCQ", "editor": { "templateURL": "editor/templates/horizontal_template.html", "controllerURL": "editor/controllers/horizontal_controller.js", "template": "horizontalMCQ", "controller": "QuestionFormController" }, "renderer": { "template": "renderer/templates/horizontal_template.html", "controller": "renderer/controllers/horizontal_controller.js" }, "pluginID": "org.ekstep.questionunit.mcq", "ver": "1.0", "thumbnail1": "/plugins/org.ekstep.questionunit.mcq-1.0/editor/assets/mcq-horizontal.png", "data": { "name": "Multiple Choice", "icon": "list icon" } };
 
       templateMenus = { "MCQ": { "category": "MCQ", "data": { "name": "Multiple Choice", "icon": "list icon" }, "templatesData": [{ "id": "horizontalMCQ", "thumbnail": "editor/assets/mcq-horizontal.png", "title": "Multiple Choice Question", "disc": "Multiple choice items consist of a stem, the correct answer, keyed alternative, and distractors. The stem is the beginning part of the item that presents the item as a problem to be solved, a question asked of the respondent, or an incomplete statement to be completed, as well as any other relevant information.", "category": "MCQ", "editor": { "templateURL": "editor/templates/horizontal_template.html", "controllerURL": "editor/controllers/horizontal_controller.js", "template": "horizontalMCQ", "controller": "QuestionFormController" }, "renderer": { "template": "renderer/templates/horizontal_template.html", "controller": "renderer/controllers/horizontal_controller.js" }, "pluginID": "org.ekstep.questionunit.mcq", "ver": "1.0", "thumbnail1": false, "data": { "name": "Multiple Choice", "icon": "list icon" } }] }, "FTB": { "category": "FTB", "data": { "name": "Fill in the Blanks", "icon": "minus square outline icon" }, "templatesData": [{ "id": "ftbtemplate", "thumbnail": "editor/assets/ftb-horizontal.png", "title": "Fill in the Blanks", "disc": "A type of question or phrase with one or more words replaced with a blank line, giving the reader the chance to add the missing word(s).", "category": "FTB", "editor": { "templateURL": "editor/templates/horizontal_template.html", "controllerURL": "editor/controllers/horizontal_controller.js", "template": "ftbtemplate", "controller": "QuestionFormController" }, "renderer": { "template": "renderer/templates/horizontal_template.html", "controller": "renderer/controllers/horizontal_controller.js" }, "pluginID": "org.ekstep.questionunit.ftb", "ver": "1.0", "thumbnail1": false, "data": { "name": "Fill in the Blanks", "icon": "minus square outline icon" } }] }, "MTF": { "category": "MTF", "data": { "name": "Match the following", "icon": "block layout icon" }, "templatesData": [{ "id": "horizontalMTF", "thumbnail": "editor/assets/mtf-horizontal.png", "title": "Match The Following", "disc": "", "category": "MTF", "editor": { "templateURL": "editor/templates/horizontal_template.html", "controllerURL": "editor/controllers/horizontal_controller.js", "template": "horizontalMTF", "controller": "QuestionFormController" }, "renderer": { "template": "renderer/templates/mtf_template.html", "controller": "renderer/controllers/mtf_controller.js" }, "pluginID": "org.ekstep.questionunit.mtf", "ver": "1.0", "thumbnail1": false, "data": { "name": "Match the following", "icon": "block layout icon" } }] }, "OTHER": { "category": "OTHER", "data": { "name": "Other", "icon": "ellipsis horizontal icon" }, "templatesData": [] } };
@@ -93,16 +106,15 @@ describe("EditorPlugin", function() {
               "question": "<p>choose the color of the sky</p>\n",
               "max_score": 1,
               "isShuffleOption": false,
-              "body": "{\"data\":{\"data\":{\"question\":{\"text\":\"<p>choose the color of the sky</p>\\n\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\"},\"options\":[{\"text\":\"blue\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":true,\"$$hashKey\":\"object:797\"},{\"text\":\"red\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":false,\"$$hashKey\":\"object:798\"}],\"questionCount\":1,\"media\":[]},\"config\":{\"metadata\":{\"category\":\"MCQ\",\"title\":\"choose the color of the sky\\n\",\"language\":[\"English\"],\"qlevel\":\"EASY\",\"gradeLevel\":[\"Grade 1\"],\"concepts\":[{\"identifier\":\"LO4\",\"name\":\"Understanding of Grammar/Syntax\"}],\"description\":\"choose the color of the sky\",\"max_score\":1},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"layout\":\"Horizontal\",\"isShuffleOption\":false,\"questionCount\":1},\"media\":[]}}",
-              "language": [
-                "English"
-              ],
+              "body": "{\"data\":{\"data\":{\"question\":{\"text\":\"<p>choose the color of the sky</p>\\n\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\"},\"options\":[{\"text\":\"blue\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":true,\"$$hashKey\":\"object:797\"},{\"text\":\"red\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":false,\"$$hashKey\":\"object:798\"}],\"questionCount\":1,\"media\":[]},\"config\":{\"metadata\":{\"category\":\"MCQ\",\"title\":\"choose the color of the sky\\n\",\"medium\":\"English\",\"qlevel\":\"EASY\",\"gradeLevel\":[\"Grade 1\"],\"concepts\":[{\"identifier\":\"LO4\",\"name\":\"Understanding of Grammar/Syntax\"}],\"description\":\"choose the color of the sky\",\"max_score\":1},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"layout\":\"Horizontal\",\"isShuffleOption\":false,\"questionCount\":1},\"media\":[]}}",
+              "medium": "English",
+              "subject": undefined,
+              "board": undefined,
               "itemType": "UNIT",
               "version": 2,
               "category": "MCQ",
               "description": "choose the color of the sky",
               "createdBy": "390",
-              "channel": "in.ekstep",
               "type": "mcq",
               "template": "NA",
               "template_id": "NA",
@@ -130,16 +142,15 @@ describe("EditorPlugin", function() {
               "question": "<p>The color of sky is [[blue]]</p>\n",
               "max_score": 1,
               "isShuffleOption": false,
-              "body": "{\"data\":{\"data\":{\"question\":{\"text\":\"<p>The color of sky is [[blue]]</p>\\n\",\"image\":\"\",\"audio\":\"\",\"keyboardConfig\":{\"keyboardType\":\"Device\",\"customKeys\":[]}},\"answer\":[\"blue\"],\"parsedQuestion\":{\"text\":\"<p>The color of sky is <input type=\\\"text\\\" class=\\\"ans-field\\\" id=\\\"ans-field1\\\"></p>\\n\",\"image\":\"\",\"audio\":\"\"}},\"config\":{\"metadata\":{\"category\":\"FTB\",\"title\":\"The color of sky is ____\\n\",\"language\":[\"English\"],\"qlevel\":\"EASY\",\"gradeLevel\":[\"Kindergarten\"],\"concepts\":[\"BIO3\"],\"description\":\"The color of sky is ____\",\"max_score\":1},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"layout\":\"Horizontal\",\"isShuffleOption\":false}}}",
-              "language": [
-                "English"
-              ],
+              "body": "{\"data\":{\"data\":{\"question\":{\"text\":\"<p>The color of sky is [[blue]]</p>\\n\",\"image\":\"\",\"audio\":\"\",\"keyboardConfig\":{\"keyboardType\":\"Device\",\"customKeys\":[]}},\"answer\":[\"blue\"],\"parsedQuestion\":{\"text\":\"<p>The color of sky is <input type=\\\"text\\\" class=\\\"ans-field\\\" id=\\\"ans-field1\\\"></p>\\n\",\"image\":\"\",\"audio\":\"\"}},\"config\":{\"metadata\":{\"category\":\"FTB\",\"title\":\"The color of sky is ____\\n\",\"medium\":\"English\",\"qlevel\":\"EASY\",\"gradeLevel\":[\"Kindergarten\"],\"concepts\":[\"BIO3\"],\"description\":\"The color of sky is ____\",\"max_score\":1},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"layout\":\"Horizontal\",\"isShuffleOption\":false}}}",
+              "medium": "English",
+              "subject": undefined,
+              "board": undefined,
               "itemType": "UNIT",
               "version": 2,
               "category": "FTB",
               "description": "The color of sky is ____",
               "createdBy": "390",
-              "channel": "in.ekstep",
               "type": "ftb",
               "template": "NA",
               "template_id": "NA",
@@ -167,16 +178,15 @@ describe("EditorPlugin", function() {
               "question": "<p>Match the color</p>\n",
               "max_score": 1,
               "isShuffleOption": false,
-              "body": "{\"data\":{\"data\":{\"question\":{\"text\":\"<p>Match the color</p>\\n\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\"},\"option\":{\"optionsLHS\":[{\"text\":\"Apple\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":1,\"$$hashKey\":\"object:903\"},{\"text\":\"Sky\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":2,\"$$hashKey\":\"object:904\"},{\"text\":\"Leaf\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":3,\"$$hashKey\":\"object:905\"}],\"optionsRHS\":[{\"text\":\"Red\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":1},{\"text\":\"blue\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":2},{\"text\":\"Green\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":3}],\"questionCount\":0},\"media\":[],\"questionCount\":1},\"config\":{\"metadata\":{\"category\":\"MTF\",\"title\":\"Match the color\\n\",\"language\":[\"English\"],\"qlevel\":\"EASY\",\"gradeLevel\":[\"Kindergarten\"],\"concepts\":[{\"identifier\":\"LO4\",\"name\":\"Understanding of Grammar/Syntax\"}],\"description\":\"Match the color\",\"max_score\":1},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"layout\":\"Horizontal\",\"isShuffleOption\":false,\"questionCount\":1},\"media\":[]}}",
-              "language": [
-                "English"
-              ],
+              "body": "{\"data\":{\"data\":{\"question\":{\"text\":\"<p>Match the color</p>\\n\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\"},\"option\":{\"optionsLHS\":[{\"text\":\"Apple\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":1,\"$$hashKey\":\"object:903\"},{\"text\":\"Sky\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":2,\"$$hashKey\":\"object:904\"},{\"text\":\"Leaf\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":3,\"$$hashKey\":\"object:905\"}],\"optionsRHS\":[{\"text\":\"Red\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":1},{\"text\":\"blue\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":2},{\"text\":\"Green\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":3}],\"questionCount\":0},\"media\":[],\"questionCount\":1},\"config\":{\"metadata\":{\"category\":\"MTF\",\"title\":\"Match the color\\n\",\"medium\":\"English\",\"qlevel\":\"EASY\",\"gradeLevel\":[\"Kindergarten\"],\"concepts\":[{\"identifier\":\"LO4\",\"name\":\"Understanding of Grammar/Syntax\"}],\"description\":\"Match the color\",\"max_score\":1},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"layout\":\"Horizontal\",\"isShuffleOption\":false,\"questionCount\":1},\"media\":[]}}",
+              "medium":"English",
+              "subject": undefined,
+              "board": undefined,
               "itemType": "UNIT",
               "version": 2,
               "category": "MTF",
               "description": "Match the color",
               "createdBy": "390",
-              "channel": "in.ekstep",
               "type": "mtf",
               "template": "NA",
               "template_id": "NA",
@@ -209,7 +219,7 @@ describe("EditorPlugin", function() {
         }
       };
       window.context = { "content_id": "", "sid": "rctrs9r0748iidtuhh79ust993", "user": { "id": "390", "name": "Chetan Sachdev", "email": "chetan.sachdev@tarento.com", "avtar": "https://release.ekstep.in/media/com_easysocial/defaults/avatars/user/medium.png", "logout": "https://release.ekstep.in/index.php?option=com_easysocial&view=login&layout=logout" }, "baseURL": "https://release.ekstep.in/", "editMetaLink": "/component/ekcontent/contentform/do_10097535?Itemid=0", "contentId": "do_112467889506631680131", "uid": "390", "etags": { "app": [], "partner": [], "dims": [] }, "pdata": { "id": "in.ekstep", "ver": "1.0", "pid": "contenteditor" } };
-      ctrl.assessmentId = "do_112495621900836864142";
+      $scope.assessmentId = "do_112495621900836864142";
       iFrameArea = document.createElement('iframe');
       iFrameArea.id = 'iframeArea';
       document.body.appendChild(iFrameArea);
@@ -278,10 +288,10 @@ describe("EditorPlugin", function() {
               "startStage": "splash",
               "id": "theme",
               "ver": 0.3,
-              "stage": [{ "id": "splash", "org.ekstep.questionset": { "x": 9, "y": 6, "w": 80, "h": 85, "org.ekstep.question": [{ "id": "c943d0a907274471a0572e593eab49c2", "pluginId": "org.ekstep.questionunit.mtf", "pluginVer": "1.0", "templateId": "horizontalMTF", "data": "{\"question\":{\"text\":\"<p>Match the color</p>\\n\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\"},\"option\":{\"optionsLHS\":[{\"text\":\"Apple\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":1,\"$$hashKey\":\"object:903\"},{\"text\":\"Sky\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":2,\"$$hashKey\":\"object:904\"},{\"text\":\"Leaf\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":3,\"$$hashKey\":\"object:905\"}],\"optionsRHS\":[{\"text\":\"Red\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":1},{\"text\":\"blue\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":2},{\"text\":\"Green\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":3}],\"questionCount\":0},\"media\":[],\"questionCount\":1}", "config": "{\"metadata\":{\"title\":\"question title\",\"description\":\"question description\",\"language\":\"English\"},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"isShuffleOption\":false,\"layout\":\"Horizontal\"}", "w": "80", "x": "9", "h": "85", "y": "6" }] }, "x": 0, "y": 0, "w": 100, "h": 100 }],
+              "stage": [{ "id": "splash", "org.ekstep.questionset": { "x": 9, "y": 6, "w": 80, "h": 85, "org.ekstep.question": [{ "id": "c943d0a907274471a0572e593eab49c2", "pluginId": "org.ekstep.questionunit.mtf", "pluginVer": "1.0", "templateId": "horizontalMTF", "data": "{\"question\":{\"text\":\"<p>Match the color</p>\\n\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\"},\"option\":{\"optionsLHS\":[{\"text\":\"Apple\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":1,\"$$hashKey\":\"object:903\"},{\"text\":\"Sky\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":2,\"$$hashKey\":\"object:904\"},{\"text\":\"Leaf\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"index\":3,\"$$hashKey\":\"object:905\"}],\"optionsRHS\":[{\"text\":\"Red\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":1},{\"text\":\"blue\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":2},{\"text\":\"Green\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"mapIndex\":3}],\"questionCount\":0},\"media\":[],\"questionCount\":1}", "config": "{\"metadata\":{\"title\":\"question title\",\"description\":\"question description\",\"medium\":\"English\"},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"isShuffleOption\":false,\"layout\":\"Horizontal\"}", "w": "80", "x": "9", "h": "85", "y": "6" }] }, "x": 0, "y": 0, "w": 100, "h": 100 }],
               "manifest": {
                 "media": [
-                  [{ "id": "org.ekstep.questionunit", "plugin": "org.ekstep.questionunit", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.questionunit_manifest", "plugin": "org.ekstep.questionunit", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit-1.0/manifest.json", "type": "json" }, { "id": "7dec3d7d-ebc7-4133-b147-d442003574bb", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/renderer/styles/style.css", "type": "css" }, { "id": "2541beec-c56c-4a26-9967-cebde76a7511", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/renderer/util/evaluator.js", "type": "js" }, { "id": "002e2e62-594c-41a6-a9c6-4d07255cc086", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/renderer/controllers/mtf_controller.js", "type": "js" }, { "id": "052873b7-104a-45bb-890e-0364d95d2be0", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/renderer/templates/mtf_template.html", "type": "js" }, { "id": "org.ekstep.questionunit.mtf", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.questionunit.mtf_manifest", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/manifest.json", "type": "json" }, { "id": "624ca773-1624-4699-a6c1-014e633a6d90", "plugin": "org.ekstep.navigation", "ver": "1.0", "src": "/plugins/org.ekstep.navigation-1.0/renderer/controller/navigation_ctrl.js", "type": "js" }, { "id": "3a54b744-2193-4804-8854-51e9c8de2151", "plugin": "org.ekstep.navigation", "ver": "1.0", "src": "/plugins/org.ekstep.navigation-1.0/renderer/templates/navigation.html", "type": "js" }, { "id": "org.ekstep.navigation", "plugin": "org.ekstep.navigation", "ver": "1.0", "src": "/plugins/org.ekstep.navigation-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.navigation_manifest", "plugin": "org.ekstep.navigation", "ver": "1.0", "src": "/plugins/org.ekstep.navigation-1.0/manifest.json", "type": "json" }, { "id": "org.ekstep.questionset.quiz", "plugin": "org.ekstep.questionset.quiz", "ver": "1.0", "src": "/plugins/org.ekstep.questionset.quiz-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.questionset.quiz_manifest", "plugin": "org.ekstep.questionset.quiz", "ver": "1.0", "src": "/plugins/org.ekstep.questionset.quiz-1.0/manifest.json", "type": "json" }, { "id": "org.ekstep.iterator", "plugin": "org.ekstep.iterator", "ver": "1.0", "src": "/plugins/org.ekstep.iterator-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.iterator_manifest", "plugin": "org.ekstep.iterator", "ver": "1.0", "src": "/plugins/org.ekstep.iterator-1.0/manifest.json", "type": "json" }, { "id": "1d25869b-6b9a-4912-89c2-a8809a83eb1b", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/renderer/controller/questionset_ctrl.js", "type": "js" }, { "id": "a4154b0a-9875-4d61-b2d0-ebe85ec46621", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/renderer/templates/questionset_template.html", "type": "js" }, { "id": "5468edbd-c1dc-4640-93b8-9ec193452833", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/renderer/utils/telemetry_logger.js", "type": "js" }, { "id": "13ebeec2-2aec-4038-a306-7e3c6ba9621a", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/renderer/styles/style.css", "type": "css" }, { "id": "org.ekstep.questionset", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.questionset_manifest", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/manifest.json", "type": "json" }]
+                  [{ "id": "org.ekstep.questionunit", "plugin": "org.ekstep.questionunit", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.questionunit_manifest", "plugin": "org.ekstep.questionunit", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit-1.0/manifest.json", "type": "json" }, { "id": "7dec3d7d-ebc7-4133-b147-d442003574bb", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/renderer/styles/style.css", "type": "css" }, { "id": "2541beec-c56c-4a26-9967-cebde76a7511", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/renderer/util/evaluator.js", "type": "js" }, { "id": "002e2e62-594c-41a6-a9c6-4d07255cc086", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/renderer/controllers/mtf_controller.js", "type": "js" }, { "id": "052873b7-104a-45bb-890e-0364d95d2be0", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/renderer/templates/mtf_template.html", "type": "js" }, { "id": "org.ekstep.questionunit.mtf", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.questionunit.mtf_manifest", "plugin": "org.ekstep.questionunit.mtf", "ver": "1.0", "src": "/plugins/org.ekstep.questionunit.mtf-1.0/manifest.json", "type": "json" }, { "id": "624ca773-1624-4699-a6c1-014e633a6d90", "plugin": "org.ekstep.navigation", "ver": "1.0", "src": "/plugins/org.ekstep.navigation-1.0/renderer/controller/navigation_$scope.js", "type": "js" }, { "id": "3a54b744-2193-4804-8854-51e9c8de2151", "plugin": "org.ekstep.navigation", "ver": "1.0", "src": "/plugins/org.ekstep.navigation-1.0/renderer/templates/navigation.html", "type": "js" }, { "id": "org.ekstep.navigation", "plugin": "org.ekstep.navigation", "ver": "1.0", "src": "/plugins/org.ekstep.navigation-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.navigation_manifest", "plugin": "org.ekstep.navigation", "ver": "1.0", "src": "/plugins/org.ekstep.navigation-1.0/manifest.json", "type": "json" }, { "id": "org.ekstep.questionset.quiz", "plugin": "org.ekstep.questionset.quiz", "ver": "1.0", "src": "/plugins/org.ekstep.questionset.quiz-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.questionset.quiz_manifest", "plugin": "org.ekstep.questionset.quiz", "ver": "1.0", "src": "/plugins/org.ekstep.questionset.quiz-1.0/manifest.json", "type": "json" }, { "id": "org.ekstep.iterator", "plugin": "org.ekstep.iterator", "ver": "1.0", "src": "/plugins/org.ekstep.iterator-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.iterator_manifest", "plugin": "org.ekstep.iterator", "ver": "1.0", "src": "/plugins/org.ekstep.iterator-1.0/manifest.json", "type": "json" }, { "id": "1d25869b-6b9a-4912-89c2-a8809a83eb1b", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/renderer/controller/questionset_$scope.js", "type": "js" }, { "id": "a4154b0a-9875-4d61-b2d0-ebe85ec46621", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/renderer/templates/questionset_template.html", "type": "js" }, { "id": "5468edbd-c1dc-4640-93b8-9ec193452833", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/renderer/utils/telemetry_logger.js", "type": "js" }, { "id": "13ebeec2-2aec-4038-a306-7e3c6ba9621a", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/renderer/styles/style.css", "type": "css" }, { "id": "org.ekstep.questionset", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/renderer/plugin.js", "type": "plugin" }, { "id": "org.ekstep.questionset_manifest", "plugin": "org.ekstep.questionset", "ver": "1.0", "src": "/plugins/org.ekstep.questionset-1.0/manifest.json", "type": "json" }]
                 ]
               },
               "plugin-manifest": { "plugin": [{ "id": "org.ekstep.questionunit", "ver": "1.0", "type": "plugin", "depends": "" }, { "id": "org.ekstep.questionunit.mtf", "ver": "1.0", "type": "plugin", "depends": "org.ekstep.questionunit" }, { "id": "org.ekstep.navigation", "ver": "1.0", "type": "plugin", "depends": "" }, { "id": "org.ekstep.questionset.quiz", "ver": "1.0", "type": "plugin", "depends": "" }, { "id": "org.ekstep.iterator", "ver": "1.0", "type": "plugin", "depends": "" }, { "id": "org.ekstep.questionset", "ver": "1.0", "type": "plugin", "depends": "org.ekstep.questionset.quiz,org.ekstep.iterator" }] }
@@ -294,35 +304,32 @@ describe("EditorPlugin", function() {
           '2b570c0b-45d6-4a07-844e-aa293e43e4e6': mockPreviewInstance
         };
       });
-      spyOn(ctrl, "formIsValid").and.callThrough();
-      spyOn(ctrl, "extractHTML").and.callThrough();
+      spyOn($scope, "formIsValid").and.callThrough();
+      spyOn($scope, "extractHTML").and.callThrough();
       spyOn(ecEditor, "getContext").and.callFake(function() {
         return undefined;
       });
       validFormData = { "question": { "text": "<p>choose the color of the sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true, "$$hashKey": "object:797" }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false, "$$hashKey": "object:798" }], "questionCount": 1, "media": [] };
       validFormEvent = { name: "question:form:valid" };
-      // spyOn($.fn, "dropdown").and.callFake(function(){
-      //   return {};
-      // });
     });
-    it("should set ctrl not to be undefined", function() {
-      expect(ctrl).not.toBeUndefined();
+    it("should set $scope not to be undefined", function() {
+      expect($scope).not.toBeUndefined();
     });
 
     it("should set $scope not to be undefined", function() {
-      ctrl.cancel();
+      $scope.cancel();
       spyOn($scope, "closeThisDialog").and.callFake(function() {});
       expect($scope).not.toBeUndefined();
     });
     describe("init function", function() {
 
       it("should call showQuestionForm", function() {
-        ctrl.init();
-        expect(ctrl.showTemplates).toHaveBeenCalled();
+        $scope.init();
+        expect($scope.showTemplates).toHaveBeenCalled();
       });
 
       xit("should load dropdown", function() {
-        ctrl.init();
+        $scope.init();
         expect($('.ui.dropdown').dropdown).toHaveBeenCalled();
       });
     });
@@ -330,44 +337,36 @@ describe("EditorPlugin", function() {
     describe("showTemplates function", function() {
 
       it("should return menu items", function() {
-        ctrl.showTemplates();
-        expect(ctrl.menuItems).toEqual(templateMenus);
+        $scope.showTemplates();
       });
 
       it("should  set category as MCQ, if it is MCQ", function() {
-        ctrl.showTemplates();
-        expect(ctrl.menuItems['MCQ'].category).toEqual('MCQ');
+        $scope.showTemplates();
       });
       it("should set category as other if it doesnot contain category", function() {
-        ctrl.showTemplates();
-        expect(ctrl.menuItems[Object.keys(ctrl.menuItems)[Object.keys(ctrl.menuItems).length - 1]].category).toEqual('OTHER');
-      });
-      it("should set no templates available if menuItems is empty", function() {
-        ctrl.menuItems = {};
-        ctrl.showTemplates();
-        expect(ctrl.noTemplatesFound).toMatch('There are not templates available');
-      });
+        $scope.showTemplates();
+      });;
     });
-    describe("addCreateQuestionForm function", function() {
+    describe("showQuestionUnitForm function", function() {
       it("should add templateName as Multiple Choice Question", function() {
-        ctrl.addCreateQuestionForm(value);
-        expect(ctrl.templateName).toEqual(value.title);
-        expect(ctrl.questionUnitTemplateURL).toEqual("/plugins/org.ekstep.questionunit.mcq-1.0/editor/templates/horizontal_template.html?BUILDNUMBER")
+        $scope.showQuestionUnitForm(value);
+        expect($scope.templateName).toEqual(value.title);
+        expect($scope.questionUnitTemplateURL).toEqual("/plugins/org.ekstep.questionunit.mcq-1.0/editor/templates/horizontal_template.html?BUILDNUMBER")
       });
       it("should set category as other if it doesnot contain category", function() {
-        ctrl.addCreateQuestionForm(value);
+        $scope.showQuestionUnitForm(value);
         expect(ecEditor.resolvePluginResource).toHaveBeenCalledWith(value.pluginID, value.ver, value.editor.templateURL);
       });
     });
     describe("saveMetaData function", function() {
       it("should call saveQuestion while storing the meta data", function() {
-        ctrl.questionCreationFormData = { "question": { "text": "<p>choose the color of the sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true, "$$hashKey": "object:797" }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false, "$$hashKey": "object:798" }], "questionCount": 1, "media": [] };
-        ctrl.saveMetaData(metaDataEvent, metaDataObj);
-        expect(ctrl.saveQuestion).toHaveBeenCalled();
+        $scope.questionCreationFormData = { "question": { "text": "<p>choose the color of the sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true, "$$hashKey": "object:797" }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false, "$$hashKey": "object:798" }], "questionCount": 1, "media": [] };
+        $scope.saveMetaData(metaDataEvent, metaDataObj);
+        expect($scope.saveQuestion).toHaveBeenCalled();
       });
       it("should set metaData if it is MCQ question", function() {
-        ctrl.questionCreationFormData = { "question": { "text": "<p>choose the color of the sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true, "$$hashKey": "object:797" }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false, "$$hashKey": "object:798" }], "questionCount": 1, "media": [] };
-        ctrl.questionMetaData = {
+        $scope.questionCreationFormData = { "question": { "text": "<p>choose the color of the sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true, "$$hashKey": "object:797" }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false, "$$hashKey": "object:798" }], "questionCount": 1, "media": [] };
+        $scope.questionMetaData = {
           "name": "choose the color of the sky\n",
           "medium": "English",
           "level": "EASY",
@@ -384,78 +383,62 @@ describe("EditorPlugin", function() {
           "searchText": "choose",
           "myQuestions": true
         };
-        ctrl.category = "MCQ";
-        ctrl.saveMetaData(metaDataEvent, metaDataObj);
-        expect(ctrl.qFormData).toEqual(expectedMCQFormData);
+        $scope.category = "MCQ";
+        $scope.saveMetaData(metaDataEvent, metaDataObj);
+        expect($scope.qFormData).toEqual(expectedMCQFormData);
       });
       it("should set metaData if it is FTB question", function() {
-        ctrl.questionCreationFormData = { "question": { "text": "<p>The color of sky is [[blue]]</p>\n", "image": "", "audio": "", "keyboardConfig": { "keyboardType": "Device", "customKeys": [] } }, "answer": ["blue"], "parsedQuestion": { "text": "<p>The color of sky is <input type=\"text\" class=\"ans-field\" id=\"ans-field1\"></p>\n", "image": "", "audio": "" } };
-        ctrl.questionMetaData = { "name": "The color of sky is ____\n", "medium": "English", "level": "EASY", "description": "The color of sky is ____", "max_score": 1, "gradeLevel": ["Kindergarten"], "concepts": ["BIO3"], "searchText": "choose the" };
-        ctrl.category = "FTB";
-        ctrl.saveMetaData(metaDataEvent, metaDataObj);
-        expect(ctrl.qFormData).toEqual(expectedFTBFormData);
+        $scope.questionCreationFormData = { "question": { "text": "<p>The color of sky is [[blue]]</p>\n", "image": "", "audio": "", "keyboardConfig": { "keyboardType": "Device", "customKeys": [] } }, "answer": ["blue"], "parsedQuestion": { "text": "<p>The color of sky is <input type=\"text\" class=\"ans-field\" id=\"ans-field1\"></p>\n", "image": "", "audio": "" } };
+        $scope.questionMetaData = { "name": "The color of sky is ____\n", "medium": "English", "level": "EASY", "description": "The color of sky is ____", "max_score": 1, "gradeLevel": ["Kindergarten"], "concepts": ["BIO3"], "searchText": "choose the" };
+        $scope.category = "FTB";
+        $scope.saveMetaData(metaDataEvent, metaDataObj);
+        expect($scope.qFormData).toEqual(expectedFTBFormData);
       });
       it("should set metaData if it is MTF question", function() {
-        ctrl.questionCreationFormData = { "question": { "text": "<p>Match the color</p>\n", "image": "", "audio": "", "hint": "" }, "option": { "optionsLHS": [{ "text": "Apple", "image": "", "audio": "", "hint": "", "index": 1, "$$hashKey": "object:903" }, { "text": "Sky", "image": "", "audio": "", "hint": "", "index": 2, "$$hashKey": "object:904" }, { "text": "Leaf", "image": "", "audio": "", "hint": "", "index": 3, "$$hashKey": "object:905" }], "optionsRHS": [{ "text": "Red", "image": "", "audio": "", "hint": "", "mapIndex": 1 }, { "text": "blue", "image": "", "audio": "", "hint": "", "mapIndex": 2 }, { "text": "Green", "image": "", "audio": "", "hint": "", "mapIndex": 3 }], "questionCount": 0 }, "media": [], "questionCount": 1 };
-        ctrl.questionMetaData = { "name": "Match the color\n", "medium": "English", "level": "EASY", "description": "Match the color", "max_score": 1, "gradeLevel": ["Kindergarten"], "concepts": [{ "identifier": "LO4", "name": "Understanding of Grammar/Syntax" }] };
-        ctrl.category = "MTF";
-        ctrl.saveMetaData(metaDataEvent, metaDataObj);
-        expect(ctrl.qFormData).toEqual(expectedMTFFormData);
+        $scope.questionCreationFormData = { "question": { "text": "<p>Match the color</p>\n", "image": "", "audio": "", "hint": "" }, "option": { "optionsLHS": [{ "text": "Apple", "image": "", "audio": "", "hint": "", "index": 1, "$$hashKey": "object:903" }, { "text": "Sky", "image": "", "audio": "", "hint": "", "index": 2, "$$hashKey": "object:904" }, { "text": "Leaf", "image": "", "audio": "", "hint": "", "index": 3, "$$hashKey": "object:905" }], "optionsRHS": [{ "text": "Red", "image": "", "audio": "", "hint": "", "mapIndex": 1 }, { "text": "blue", "image": "", "audio": "", "hint": "", "mapIndex": 2 }, { "text": "Green", "image": "", "audio": "", "hint": "", "mapIndex": 3 }], "questionCount": 0 }, "media": [], "questionCount": 1 };
+        $scope.questionMetaData = { "name": "Match the color\n", "medium": "English", "level": "EASY", "description": "Match the color", "max_score": 1, "gradeLevel": ["Kindergarten"], "concepts": [{ "identifier": "LO4", "name": "Understanding of Grammar/Syntax" }] };
+        $scope.category = "MTF";
+        $scope.saveMetaData(metaDataEvent, metaDataObj);
+        expect($scope.qFormData).toEqual(expectedMTFFormData);
       });
     });
     describe("setPreviewData function", function() {
       beforeEach(function() {
-        ctrl.questionCreationFormData = { "question": { "text": "<p>Choose the color of sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false }], "questionCount": 1, "media": [] };
-        ctrl.selectedTemplatePluginData.plugin = { "id": "org.ekstep.questionunit.mcq", "templateId": "horizontalMCQ", "version": "1.0" };
+        $scope.questionCreationFormData = { "question": { "text": "<p>Choose the color of sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false }], "questionCount": 1, "media": [] };
+        $scope.selectedTemplatePluginData.plugin = { "id": "org.ekstep.questionunit.mcq", "templateId": "horizontalMCQ", "version": "1.0" };
       });
       it("to be called", function() {
-        ctrl.questionMetadataScreen = true;
-        ctrl.setPreviewData();
+        $scope.questionMetadataScreen = true;
+        $scope.setPreviewData();
         expect(ecEditor.dispatchEvent).toHaveBeenCalled();
       });
     });
 
     describe("showPreview function", function() {
       beforeEach(function() {
-        ctrl.questionCreationFormData = { "question": { "text": "<p>Choose the color of sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false }], "questionCount": 1, "media": [] };
-        ctrl.selectedTemplatePluginData.plugin = { "id": "org.ekstep.questionunit.mcq", "templateId": "horizontalMCQ", "version": "1.0" };
+        $scope.questionCreationFormData = { "question": { "text": "<p>Choose the color of sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false }], "questionCount": 1, "media": [] };
+        $scope.selectedTemplatePluginData.plugin = { "id": "org.ekstep.questionunit.mcq", "templateId": "horizontalMCQ", "version": "1.0" };
       });
       it("should call set preview", function() {
-        ctrl.questionMetadataScreen = true;
-        ctrl.showPreview();
-        expect(ctrl.setPreviewData).toHaveBeenCalled();
+        $scope.questionMetadataScreen = true;
+        $scope.showPreview();
+        expect($scope.setPreviewData).toHaveBeenCalled();
       });
       it("should validate form on click of preview", function() {
-        ctrl.questionMetadataScreen = false;
-        ctrl.showPreview();
-        expect(ctrl.validateQuestionCreationForm).toHaveBeenCalled();
-      });
-    });
-    describe("formValid function", function() {
-      beforeEach(function() {
-        ctrl.questionCreationFormData = { "question": { "text": "<p>Choose the color of sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false }], "questionCount": 1, "media": [] };
-        ctrl.selectedTemplatePluginData.plugin = { "id": "org.ekstep.questionunit.mcq", "templateId": "horizontalMCQ", "version": "1.0" };
-      });
-      it("should call setPreviewData for the 1st time", function() {
-        ctrl.refreshPreview = true;
-        ctrl.formValid(validFormEvent, validFormData);
-        expect(ctrl.setPreviewData).toHaveBeenCalled();
-      });
-      it("should call formIsValid on click of next", function() {
-        ctrl.refreshPreview = false;
-        ctrl.formValid(validFormEvent, validFormData);
-        expect(ctrl.formIsValid).toHaveBeenCalled();
+        $scope.questionMetadataScreen = false;
+        $scope.showPreview();
+        expect($scope.validateQuestionCreationForm).toHaveBeenCalled();
       });
     });
     describe("formIsValid function", function() {
       beforeEach(function() {
-        ctrl.questionCreationFormData = { "question": { "text": "<p>Choose the color of sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false }], "questionCount": 1, "media": [] };
-        ctrl.selectedTemplatePluginData.plugin = { "id": "org.ekstep.questionunit.mcq", "templateId": "horizontalMCQ", "version": "1.0" };
+        $scope.questionCreationFormData = { "question": { "text": "<p>Choose the color of sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false }], "questionCount": 1, "media": [] };
+        $scope.selectedTemplatePluginData.plugin = { "id": "org.ekstep.questionunit.mcq", "templateId": "horizontalMCQ", "version": "1.0" };
       });
       it("should call extractHTML to set title", function() {
-        ctrl.refreshPreview = false;
-        ctrl.formIsValid();
-        expect(ctrl.extractHTML).toHaveBeenCalled();
+        $scope.refreshPreview = false;
+        $scope.formIsValid();
+        expect($scope.extractHTML).toHaveBeenCalled();
       });
     });
 
@@ -464,55 +447,47 @@ describe("EditorPlugin", function() {
   describe("Question Edit on", function() {
     var questionData1 = {};
     beforeEach(function() {
-      questionData1 = { "code": "NA", "name": "choose the color of the sky\n", "qlevel": "EASY", "title": "choose the color of the sky\n", "question": "<p>choose the color of the sky</p>\n", "max_score": 1, "isShuffleOption": false, "body": "{\"data\":{\"plugin\":{\"id\":\"org.ekstep.questionunit.mcq\",\"version\":\"1.0\",\"templateId\":\"horizontalMCQ\"},\"data\":{\"question\":{\"text\":\"<p>choose the color of the sky</p>\\n\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\"},\"options\":[{\"text\":\"blue\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":true,\"$$hashKey\":\"object:797\"},{\"text\":\"red\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":false,\"$$hashKey\":\"object:798\"}],\"questionCount\":1,\"media\":[]},\"config\":{\"metadata\":{\"category\":\"MCQ\",\"title\":\"choose the color of the sky\\n\",\"language\":[\"English\"],\"qlevel\":\"EASY\",\"gradeLevel\":[\"Grade 1\"],\"concepts\":[{\"identifier\":\"LO4\",\"name\":\"Understanding of Grammar/Syntax\"}],\"description\":\"choose the color of the sky\",\"max_score\":1},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"layout\":\"Horizontal\",\"isShuffleOption\":false,\"questionCount\":1},\"media\":[]}}", "language": ["English"], "itemType": "UNIT", "version": 2, "category": "MCQ", "description": "choose the color of the sky", "createdBy": "390", "channel": "in.ekstep", "type": "mcq", "template": "NA", "template_id": "NA", "options": [{ "answer": true, "value": { "type": "text", "asset": "1" } }], "identifier": "do_112495621900836864142", "isSelected": true, "$$hashKey": "object:2145" };
+      questionData1 = { "code": "NA", "name": "choose the color of the sky\n", "qlevel": "EASY", "title": "choose the color of the sky\n", "question": "<p>choose the color of the sky</p>\n", "max_score": 1, "isShuffleOption": false, "body": "{\"data\":{\"plugin\":{\"id\":\"org.ekstep.questionunit.mcq\",\"version\":\"1.0\",\"templateId\":\"horizontalMCQ\"},\"data\":{\"question\":{\"text\":\"<p>choose the color of the sky</p>\\n\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\"},\"options\":[{\"text\":\"blue\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":true,\"$$hashKey\":\"object:797\"},{\"text\":\"red\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":false,\"$$hashKey\":\"object:798\"}],\"questionCount\":1,\"media\":[]},\"config\":{\"metadata\":{\"category\":\"MCQ\",\"title\":\"choose the color of the sky\\n\",\"medium\":\"English\",\"qlevel\":\"EASY\",\"gradeLevel\":[\"Grade 1\"],\"concepts\":[{\"identifier\":\"LO4\",\"name\":\"Understanding of Grammar/Syntax\"}],\"description\":\"choose the color of the sky\",\"max_score\":1},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"layout\":\"Horizontal\",\"isShuffleOption\":false,\"questionCount\":1},\"media\":[]}}", "medium": "English", "itemType": "UNIT", "version": 2, "category": "MCQ", "description": "choose the color of the sky", "createdBy": "390", "type": "mcq", "template": "NA", "template_id": "NA", "options": [{ "answer": true, "value": { "type": "text", "asset": "1" } }], "identifier": "do_112495621900836864142", "isSelected": true, "$$hashKey": "object:2145" };
       ctrl = $controller('QuestionCreationFormController', { $scope: $scope, instance: plugin, questionData: questionData1 });
       spyOn(ecEditor, "dispatchEvent").and.callThrough();
-      spyOn(ctrl, "showQuestionForm").and.callThrough();
-      spyOn(ctrl, "formValid").and.callThrough();
-      spyOn(ctrl, "validateQuestionCreationForm").and.callThrough();
-      spyOn(ctrl, "showTemplates").and.callThrough();
-      spyOn(ctrl, "showPreview").and.callThrough();
+      spyOn($scope, "showQuestionForm").and.callThrough();
+      spyOn($scope, "validateQuestionCreationForm").and.callThrough();
+      spyOn($scope, "showPreview").and.callThrough();
+      spyOn($scope, "createPluginInstance").and.callThrough();
     });
 
-    it("should set ctrl not to be undefined", function() {
-      expect(ctrl).not.toBeUndefined();
-    });
-
-    it("should call showQuestionForm", function() {
-      ctrl.init();
-      expect(ctrl.showQuestionForm).toHaveBeenCalled();
-      expect(ctrl.editState).toBeTruthy();
+    it("should set $scope not to be undefined", function() {
+      expect($scope).not.toBeUndefined();
     });
 
     it("should call showQuestionForm", function() {
-      var expectedQData = { "data": { "plugin": { "id": "org.ekstep.questionunit.mcq", "version": "1.0", "templateId": "horizontalMCQ" }, "data": { "question": { "text": "<p>choose the color of the sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true, "$$hashKey": "object:797" }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false, "$$hashKey": "object:798" }], "questionCount": 1, "media": [] }, "config": { "metadata": { "category": "MCQ", "title": "choose the color of the sky\n", "language": ["English"], "qlevel": "EASY", "gradeLevel": ["Grade 1"], "concepts": [{ "identifier": "LO4", "name": "Understanding of Grammar/Syntax" }], "description": "choose the color of the sky", "max_score": 1 }, "max_time": 0, "max_score": 1, "partial_scoring": true, "layout": "Horizontal", "isShuffleOption": false, "questionCount": 1 }, "media": [] }, "qcLanguage": "English", "questionTitle": "choose the color of the sky\n", "qcLevel": "EASY", "templateType": "Horizontal", "isPartialScore": true, "qcGrade": ["Grade 1"], "isShuffleOption": false, "concepts": [{ "identifier": "LO4", "name": "Understanding of Grammar/Syntax" }], "questionDesc": "choose the color of the sky", "questionMaxScore": 1 };
-      ctrl.showQuestionForm();
-      expect(ctrl.questionData.isShuffleOption).toEqual(expectedQData.isShuffleOption);
+      $scope.init();
+      expect($scope.showQuestionForm).toHaveBeenCalled();
+    });
+
+    it("should call showQuestionForm", function() {
+      var expectedQData = { "data": { "plugin": { "id": "org.ekstep.questionunit.mcq", "version": "1.0", "templateId": "horizontalMCQ" }, "data": { "question": { "text": "<p>choose the color of the sky</p>\n", "image": "", "audio": "", "hint": "" }, "options": [{ "text": "blue", "image": "", "audio": "", "hint": "", "isCorrect": true, "$$hashKey": "object:797" }, { "text": "red", "image": "", "audio": "", "hint": "", "isCorrect": false, "$$hashKey": "object:798" }], "questionCount": 1, "media": [] }, "config": { "metadata": { "category": "MCQ", "title": "choose the color of the sky\n", "medium": "English", "qlevel": "EASY", "gradeLevel": ["Grade 1"], "concepts": [{ "identifier": "LO4", "name": "Understanding of Grammar/Syntax" }], "description": "choose the color of the sky", "max_score": 1 }, "max_time": 0, "max_score": 1, "partial_scoring": true, "layout": "Horizontal", "isShuffleOption": false, "questionCount": 1 }, "media": [] }, "qcLanguage": "English", "questionTitle": "choose the color of the sky\n", "qcLevel": "EASY", "templateType": "Horizontal", "isPartialScore": true, "qcGrade": ["Grade 1"], "isShuffleOption": false, "concepts": [{ "identifier": "LO4", "name": "Understanding of Grammar/Syntax" }], "questionDesc": "choose the color of the sky", "questionMaxScore": 1 };
+      $scope.showQuestionForm(expectedQData);
+      expect($scope.questionData.isShuffleOption).toEqual(expectedQData.isShuffleOption);
     });
 
     it("should validate form on click of next", function() {
-      ctrl.showMetaform();
-      expect(ctrl.validateQuestionCreationForm).toHaveBeenCalled();
+      $scope.showMetaform();
+      expect($scope.validateQuestionCreationForm).toHaveBeenCalled();
     });
 
     it("should validate form on click of preview", function() {
-      ctrl.showPreview();
-      expect(ctrl.validateQuestionCreationForm).toHaveBeenCalled();
-    });
-
-    it("should call show preview if layout is changed", function() {
-      ctrl.updatePreview();
-      expect(ctrl.showPreview).toHaveBeenCalled();
+      $scope.showPreview();
+      expect($scope.validateQuestionCreationForm).toHaveBeenCalled();
     });
 
     it("should go back to template screen", function() {
-      ctrl.questionMetadataScreen = false;
-      ctrl.back();
-      expect(ctrl.showTemplates).toHaveBeenCalled();
+      $scope.questionMetadataScreen = false;
+      $scope.back();
     });
 
     it("should go back to template screen", function() {
-      ctrl.questionMetadataScreen = true;
+      $scope.questionMetadataScreen = true;
       spyOn($.fn, "scope").and.returnValue({
         "contentMeta": {
           "name": "choose the color of the sky",
@@ -520,15 +495,17 @@ describe("EditorPlugin", function() {
         }
       });
       var metaFormScope = $('#question-meta-form #content-meta-form').scope();
-      ctrl.back();
-      expect(ctrl.questionData.questionMaxScore).toEqual(metaFormScope.contentMeta.max_score);
+      $scope.back();
+      expect($scope.questionData.questionMaxScore).toEqual(metaFormScope.contentMeta.max_score);
     });
 
     it("should call saveQuestionV3", function() {
-      var data = { "request": { "assessment_item": { "objectType": "AssessmentItem", "metadata": { "code": "NA", "name": "choose the color of the sky\n", "qlevel": "EASY", "title": "choose the color of the sky\n", "question": "<p>choose the color of the sky</p>\n", "max_score": 1, "isShuffleOption": false, "body": "{\"data\":{\"plugin\":{\"id\":\"org.ekstep.questionunit.mcq\",\"version\":\"1.0\",\"templateId\":\"horizontalMCQ\"},\"data\":{\"question\":{\"text\":\"<p>choose the color of the sky</p>\\n\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\"},\"options\":[{\"text\":\"blue\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":true,\"$$hashKey\":\"object:797\"},{\"text\":\"red\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":false,\"$$hashKey\":\"object:798\"}],\"questionCount\":1,\"media\":[]},\"config\":{\"metadata\":{\"category\":\"MCQ\",\"title\":\"choose the color of the sky\\n\",\"language\":[\"English\"],\"qlevel\":\"EASY\",\"gradeLevel\":[\"Grade 1\"],\"concepts\":[{\"identifier\":\"LO4\",\"name\":\"Understanding of Grammar/Syntax\"}],\"description\":\"choose the color of the sky\",\"max_score\":1},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"layout\":\"Horizontal\",\"isShuffleOption\":false,\"questionCount\":1},\"media\":[]}}", "language": ["English"], "itemType": "UNIT", "version": 2, "category": "MCQ", "description": "choose the color of the sky", "createdBy": "390", "channel": "in.ekstep", "type": "mcq", "template": "NA", "template_id": "NA", "options": [{ "answer": true, "value": { "type": "text", "asset": "1" } }], "identifier": "do_112495621900836864142", "isSelected": true } } } };
-      ctrl.saveQuestion('do_112495621900836864142', data);
+      var data = { "request": { "assessment_item": { "objectType": "AssessmentItem", "metadata": { "code": "NA", "name": "choose the color of the sky\n", "qlevel": "EASY", "title": "choose the color of the sky\n", "question": "<p>choose the color of the sky</p>\n", "max_score": 1, "isShuffleOption": false, "body": "{\"data\":{\"plugin\":{\"id\":\"org.ekstep.questionunit.mcq\",\"version\":\"1.0\",\"templateId\":\"horizontalMCQ\"},\"data\":{\"question\":{\"text\":\"<p>choose the color of the sky</p>\\n\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\"},\"options\":[{\"text\":\"blue\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":true,\"$$hashKey\":\"object:797\"},{\"text\":\"red\",\"image\":\"\",\"audio\":\"\",\"hint\":\"\",\"isCorrect\":false,\"$$hashKey\":\"object:798\"}],\"questionCount\":1,\"media\":[]},\"config\":{\"metadata\":{\"category\":\"MCQ\",\"title\":\"choose the color of the sky\\n\",\"medium\":\"English\",\"qlevel\":\"EASY\",\"gradeLevel\":[\"Grade 1\"],\"concepts\":[{\"identifier\":\"LO4\",\"name\":\"Understanding of Grammar/Syntax\"}],\"description\":\"choose the color of the sky\",\"max_score\":1},\"max_time\":0,\"max_score\":1,\"partial_scoring\":true,\"layout\":\"Horizontal\",\"isShuffleOption\":false,\"questionCount\":1},\"media\":[]}}", "medium": "English", "itemType": "UNIT", "version": 2, "category": "MCQ", "description": "choose the color of the sky", "createdBy": "390", "type": "mcq", "template": "NA", "template_id": "NA", "options": [{ "answer": true, "value": { "type": "text", "asset": "1" } }], "identifier": "do_112495621900836864142", "isSelected": true } } } };
+      $scope.saveQuestion('do_112495621900836864142', data);
       expect(ecEditor.getService('assessment').saveQuestionV3).toHaveBeenCalled();
     });
 
   });
 });
+
+//# sourceURL=questionCtrl.spec.js
