@@ -170,9 +170,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     	$scope.questionData.questionTitle = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text : $scope.questionData.questionTitle;
     }
     $scope.questionData.questionTitle = $scope.extractHTML($scope.questionData.questionTitle);
-    $scope.questionMetaData.name = $scope.questionData.questionTitle;
+    $scope.questionMetaData.title = $scope.questionData.questionTitle;
     $scope.questionMetaData.medium = $scope.questionData.qcMedium;
-    $scope.questionMetaData.level = $scope.questionData.qcLevel;
+    $scope.questionMetaData.qlevel = $scope.questionData.qcLevel;
     $scope.questionMetaData.description = $scope.questionData.questionDesc;
     $scope.questionMetaData.max_score = $scope.questionData.questionMaxScore;
     $scope.questionMetaData.gradeLevel = $scope.questionData.qcGrade;
@@ -211,7 +211,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	var questionFormData = {};
     var data = {}; // TODO: You have to get this from Q.Unit plugin(getData())
     data.plugin = $scope.selectedTemplatePluginData.plugin;
-    data.data = $scope.questionCreationFormData;
+    data.data = $scope.questionCreationFormData; 
+
     var outRelations = [];
     _.each($scope.questionMetaData.concepts, function(concept){
       outRelations.push({
@@ -219,22 +220,21 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
         "relationType": "associatedTo"
       })
     });
-    var metadataObj = { category: $scope.category, title:  $scope.questionMetaData.name, medium: $scope.questionMetaData.medium, qlevel:  $scope.questionMetaData.level, gradeLevel:  $scope.questionMetaData.gradeLevel, concepts:  outRelations, topic:  $scope.questionMetaData.topic, description:  $scope.questionMetaData.description, max_score:  $scope.questionMetaData.max_score, subject:  $scope.questionMetaData.subject, board:  $scope.questionMetaData.board  };
+    
+    var metadataObj = $scope.questionMetaData;    
+    metadataObj.category = $scope.category;
+
+   // var metadataObj = { category: $scope.category, title:  $scope.questionMetaData.name, medium: $scope.questionMetaData.medium, qlevel:  $scope.questionMetaData.level, gradeLevel:  $scope.questionMetaData.gradeLevel, concepts:  $scope.questionMetaData.concepts, description:  $scope.questionMetaData.description, max_score:  $scope.questionMetaData.max_score, subject:  $scope.questionMetaData.subject, board:  $scope.questionMetaData.board  };
+
     data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": $scope.questionCreationFormData.questionCount};
     data.media = $scope.questionCreationFormData.media;
     questionFormData.data = data;
     var metadata = {
     	"code": "NA",
     	"name": $scope.questionMetaData.name,
-    	"qlevel": $scope.questionMetaData.level,
-    	"title": $scope.questionMetaData.name,
     	"question": $scope.questionCreationFormData.question.text,
-    	"max_score": $scope.questionMetaData.max_score,
     	"isShuffleOption" : $scope.questionData.isShuffleOption,
     	"body": JSON.stringify(questionFormData),
-    	"medium": $scope.questionMetaData.medium,
-    	"subject": $scope.questionMetaData.subject,
-    	"board": $scope.questionMetaData.board,
     	"itemType": "UNIT",
     	"version": 2,
     	"category": $scope.category,
@@ -248,6 +248,13 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       //"framework": "NCFCOPY"
       "framework": ecEditor.getContext('framework')
     };
+
+     for (var key in $scope.questionMetaData) {
+        if ($scope.questionMetaData.hasOwnProperty(key)) {
+          metadata[key] = $scope.questionMetaData[key];
+        }
+      }
+
     var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
     var mtfoptions = [{
     	"value": {
