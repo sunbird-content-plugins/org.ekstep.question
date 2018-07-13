@@ -267,3 +267,7 @@ color: white;
 .formDiv{
     overflow: auto;
 }
+.previewArea{
+    height: 80vh;
+    overflow-y:auto; 
+}

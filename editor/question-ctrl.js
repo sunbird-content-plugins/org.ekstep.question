@@ -35,7 +35,13 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		}
 		EventBus.listeners['editor:form:data'] = undefined;
 		ecEditor.addEventListener('editor:form:data', $scope.saveMetaData);
+    ecEditor.addEventListener("editor:handle:partialscoring",$scope.handlePartialScore);
 	};
+  $scope.handlePartialScore=function(event,isPScore){
+    $scope.questionData.isPartialScore=isPScore;
+    $scope.$safeApply();
+    event.target($scope.questionData.isPartialScore);
+  }
 	$scope.showTemplates = function() {
 		$scope.templatesScreen = true;
 		$scope.questionMetadataScreen = false;
