@@ -334,13 +334,13 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	if (questionData1.data.config.metadata.concepts) {
   		$scope.Totalconcepts = questionData1.data.config.metadata.concepts.length;
   	}
-    if (questionData1.data.config.metadata.topic) {
-      $scope.Totaltopics = questionData1.data.config.metadata.topic.length;
+    if (questionData.topic) {
+      $scope.Totaltopics = questionData.topic.length;
     }
     $scope.questionData.concepts = questionData1.data.config.metadata.concepts;
-  	$scope.questionData.topic = questionData1.data.config.metadata.topic;
+  	$scope.questionData.topic = questionData.topic;
     $scope.selectedConceptsData = questionData1.data.config.metadata.concepts;
-  	$scope.selectedTopicsData = questionData1.data.config.metadata.topic;
+  	$scope.selectedTopicsData = questionData.topic;
   	$scope.questionData.questionDesc = questionData1.data.config.metadata.description;
   	$scope.questionData.questionMaxScore = questionData1.data.config.metadata.max_score;
   	$scope.conceptsCheck = true;
