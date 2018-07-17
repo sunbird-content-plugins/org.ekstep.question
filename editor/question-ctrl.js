@@ -74,7 +74,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 			"templateId": obj.editor.template
 		};
 		var pluginInstance = $scope.createPluginInstance(obj.pluginID);
-		pluginInstance.__proto__.__proto__._data = {};
+		pluginInstance._data = {};
 		$scope.unitPlugin = obj.pluginID;
 		$scope.pluginVer = obj.ver;
 		$scope.templateId = obj.editor.template;
@@ -93,10 +93,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	pluginInstance.validateForm($scope.validatedForm);
   }
 
-  $scope.validatedForm = function(isFormValid){
+  $scope.validatedForm = function(isFormValid,data){
   	if(isFormValid){
-  		var pluginInstance = $scope.createPluginInstance($scope.selectedTemplatePluginData.plugin.id);
-  		$scope.questionCreationFormData = pluginInstance.__proto__.__proto__._data;
+  		$scope.questionCreationFormData = data;
   		$scope.setPreviewData();
   		if (!$scope.refreshPreview) {
   			$scope.formIsValid();
