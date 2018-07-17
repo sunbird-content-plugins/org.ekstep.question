@@ -150,6 +150,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   		$scope.showTemplates();
   	} else {
   		var metaFormScope = $('#question-meta-form #content-meta-form').scope();
+      metaFormScope.isSubmit = false;
   		$scope.questionData.questionTitle = metaFormScope.contentMeta.name;
   		$scope.questionData.qcMedium = metaFormScope.contentMeta.medium;
   		$scope.questionData.qcLevel = metaFormScope.contentMeta.level;
@@ -199,7 +200,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   $scope.sendMetaData = function () {
   	var formElement = $("#questionMetaDataTemplate").find("#content-meta-form");
   	var frmScope = formElement.scope();
-  	ecEditor.dispatchEvent("metadata:form:onsuccess", {form: frmScope.metaForm});
+    ecEditor.dispatchEvent("metadata:form:onsuccess", {target: '#questionMetaDataTemplate', form: frmScope.metaForm});
   };
   $scope.saveMetaData = function (event, object) {
   	var metaDataObject = object.formData.metaData;
