@@ -41,7 +41,10 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.showTemplates = function() {
 		$scope.templatesScreen = true;
 		$scope.questionMetadataScreen = false;
-		var PluginsData = JSON.parse(localStorage.getItem("qs-plugins"));
+    var PluginsData = [];
+    ecEditor.dispatchEvent("org.ekstep.questionbank:getPlugins",function(pluginData){
+      PluginsData = pluginData;
+    });
     _.each(PluginsData, function(val, key) { // eslint-disable-line no-unused-vars
     	if (val.contentType == "Plugin") {
     		var pluginManifest = org.ekstep.pluginframework.pluginManager.getPluginManifest(val.identifier);
