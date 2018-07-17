@@ -17,7 +17,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		questionsetPlugin: 'org.ekstep.questionset',
 		questionbankPlugin: 'org.ekstep.questionbank'
 	};
-	$scope.questionData = {'questionMaxScore': 1};
+	$scope.questionData = {'max_score': 1};
 	$scope.questionData.isShuffleOption = false;
 	$scope.questionData.isPartialScore = true;
 	$scope.questionData.templateType = $scope.templatesType[0];
@@ -99,10 +99,10 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	pluginInstance.validateForm($scope.validatedForm);
   }
 
-  $scope.validatedForm = function(isFormValid){
+  $scope.validatedForm = function(isFormValid, data){
   	if(isFormValid){
   		var pluginInstance = $scope.createPluginInstance($scope.selectedTemplatePluginData.plugin.id);
-  		$scope.questionCreationFormData = pluginInstance._data;
+  		$scope.questionCreationFormData = data;
   		$scope.setPreviewData();
   		if (!$scope.refreshPreview) {
   			$scope.formIsValid();
@@ -157,12 +157,12 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	} else {
   		var metaFormScope = $('#question-meta-form #content-meta-form').scope();
   		$scope.questionData.questionTitle = metaFormScope.contentMeta.name;
-  		$scope.questionData.qcMedium = metaFormScope.contentMeta.medium;
-  		$scope.questionData.qcLevel = metaFormScope.contentMeta.level;
-  		$scope.questionData.questionDesc = metaFormScope.contentMeta.description;
-  		$scope.questionData.questionMaxScore = metaFormScope.contentMeta.max_score;
-  		$scope.questionData.qcGrade = metaFormScope.contentMeta.gradeLevel;
-  		$scope.questionData.concepts = metaFormScope.contentMeta.concepts;
+  		$scope.questionData.medium = metaFormScope.contentMeta.medium;
+      $scope.questionData.qlevel = metaFormScope.contentMeta.level;
+      $scope.questionData.description = metaFormScope.contentMeta.description;
+      $scope.questionData.max_score = metaFormScope.contentMeta.max_score;
+      $scope.questionData.gradeLevel = metaFormScope.contentMeta.gradeLevel;
+      $scope.questionData.concepts = metaFormScope.contentMeta.concepts;
   		$scope.questionData.topic = metaFormScope.contentMeta.topic;
   		$scope.questionMetadataScreen = false;
   	}
@@ -176,33 +176,45 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     	$scope.questionData.questionTitle = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text : $scope.questionData.questionTitle;
     }
     $scope.questionData.questionTitle = $scope.extractHTML($scope.questionData.questionTitle);
-    $scope.questionMetaData.title = $scope.questionData.questionTitle;
-    $scope.questionMetaData.medium = $scope.questionData.qcMedium;
-    $scope.questionMetaData.qlevel = $scope.questionData.qcLevel;
+
+     for (var key in $scope.questionData) {
+      if ($scope.questionData.hasOwnProperty(key)) {
+        if (key == 'questionTitle') {
+          $scope.questionMetaData['title'] = $scope.questionData['questionTitle'];
+        } else {
+          $scope.questionMetaData[key] = $scope.questionData[key];
+        }
+      }
+     }
+
+   /* $scope.questionMetaData.title = $scope.questionData.questionTitle;
+    $scope.questionMetaData.medium = $scope.questionData.medium;
+    $scope.questionMetaData.qlevel = $scope.questionData.qlevel;
     $scope.questionMetaData.description = $scope.questionData.questionDesc;
-    $scope.questionMetaData.max_score = $scope.questionData.questionMaxScore;
-    $scope.questionMetaData.gradeLevel = $scope.questionData.qcGrade;
+    $scope.questionMetaData.max_score = $scope.questionData.max_score;
+    $scope.questionMetaData.gradeLevel = $scope.questionData.gradeLevel;
     $scope.questionMetaData.concepts = $scope.questionData.concepts;
     $scope.questionMetaData.topic = $scope.questionData.topic;
     $scope.questionMetaData.subject = $scope.questionData.subject;
-    $scope.questionMetaData.board = $scope.questionData.board;
+    $scope.questionMetaData.board = $scope.questionData.board;*/
     if ($scope.questionMetaData.concepts) {
     	$scope.questionMetaData.conceptData = "(" + $scope.questionData.concepts.length + ") concepts selected";
     }
     if ($scope.questionMetaData.topic) {
       $scope.questionMetaData.topicData = "(" + $scope.questionData.topic.length + ") topics selected";
     }
-    ecEditor.dispatchEvent('org.ekstep.editcontentmeta:showpopup', {
+    ecEditor.dispatchEvent('org.ekstep.editcontentmeta:showpopup1', {
     	action: 'question-meta-save',
     	subType: 'questions',
-    	framework: ecEditor.getContext('framework'),
-    	rootOrgId: ecEditor.getContext('channel'),
+    	framework: 'NCF',
+    	rootOrgId: '',
     	type: 'content',
     	popup: false,
     	metadata: $scope.questionMetaData
     });
   }
-  $scope.sendMetaData = function () {
+  $scope.sendMetaData = function (newQuestionCreate) {
+    $scope.isNewQuestion = newQuestionCreate;
   	var formElement = $("#questionMetaDataTemplate").find("#content-meta-form");
   	var frmScope = formElement.scope();
   	ecEditor.dispatchEvent("metadata:form:onsuccess", {form: frmScope.metaForm});
@@ -232,12 +244,12 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 
    // var metadataObj = { category: $scope.category, title:  $scope.questionMetaData.name, medium: $scope.questionMetaData.medium, qlevel:  $scope.questionMetaData.level, gradeLevel:  $scope.questionMetaData.gradeLevel, concepts:  $scope.questionMetaData.concepts, description:  $scope.questionMetaData.description, max_score:  $scope.questionMetaData.max_score, subject:  $scope.questionMetaData.subject, board:  $scope.questionMetaData.board  };
 
-    data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": $scope.questionCreationFormData.questionCount};
+    data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.max_score, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": $scope.questionCreationFormData.questionCount};
     data.media = $scope.questionCreationFormData.media;
     questionFormData.data = data;
     var metadata = {
     	"code": "NA",
-    	"name": $scope.questionMetaData.name,
+    	"name": $scope.questionMetaData.title,
     	"question": $scope.questionCreationFormData.question.text,
     	"isShuffleOption" : $scope.questionData.isShuffleOption,
     	"body": JSON.stringify(questionFormData),
@@ -306,8 +318,14 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   		if (!err) {
   			var qMetadata = $scope.qFormData.request.assessment_item.metadata;
   			qMetadata.identifier = resp.data.result.node_id;
-  			ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
-  			$scope.closeThisDialog();
+  			if($scope.isNewQuestion){
+          $scope.templatesScreen = true;
+          $scope.questionMetadataScreen = false;
+          $scope.$safeApply();
+        }else{
+         ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
+         $scope.closeThisDialog();
+        }
   		} else {
   			ecEditor.dispatchEvent("org.ekstep.toaster:error", {
   				title: 'Failed to save question...',
@@ -324,14 +342,14 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	$scope.assessmentId = questionData.identifier;
   	$scope.questionData = questionData1;
   	$scope.questionCreationFormData = questionData1.data.data;
-  	$scope.questionData.qcMedium = questionData1.data.config.metadata.medium;
+  	$scope.questionData.medium = questionData1.data.config.metadata.medium;
   	$scope.questionData.questionTitle = questionData1.data.config.metadata.title;
-  	$scope.questionData.qcLevel = questionData1.data.config.metadata.qlevel;
+  	$scope.questionData.qlevel = questionData1.data.config.metadata.qlevel;
   	$scope.questionData.subject = questionData1.data.config.metadata.subject;
   	$scope.questionData.board = questionData1.data.config.metadata.board;
   	$scope.questionData.templateType = questionData1.data.config.layout;
   	$scope.questionData.isPartialScore = questionData1.data.config.partial_scoring;
-  	$scope.questionData.qcGrade = questionData1.data.config.metadata.gradeLevel;
+  	$scope.questionData.gradeLevel = questionData1.data.config.metadata.gradeLevel;
   	$scope.questionData.isShuffleOption = questionData1.data.config.isShuffleOption;
   	$scope.category = questionData.category;
   	if (questionData1.data.config.metadata.concepts) {
@@ -345,7 +363,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     $scope.selectedConceptsData = questionData1.data.config.metadata.concepts;
   	$scope.selectedTopicsData = questionData1.data.config.metadata.topic;
   	$scope.questionData.questionDesc = questionData1.data.config.metadata.description;
-  	$scope.questionData.questionMaxScore = questionData1.data.config.metadata.max_score;
+  	$scope.questionData.max_score = questionData1.data.config.metadata.max_score;
   	$scope.conceptsCheck = true;
   	$scope.topicsCheck = true;
   	var pluginID = questionData1.data.plugin.id;

@@ -127,8 +127,13 @@
                     Next
                 </button>
                 <button class="ui large blue button" ng-if="questionMetadataScreen" id="save-question-button"
-                        ng-click="sendMetaData();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
+                        ng-click="sendMetaData(false);generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
                     Submit
+                </button>
+                <div class="or" ng-show="!templatesScreen && questionMetadataScreen"></div>
+                <button class="ui large blue button" ng-if="questionMetadataScreen" id="save-question-button"
+                        ng-click="sendMetaData(true);generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
+                    Save and Create
                 </button>
 
             </div>
