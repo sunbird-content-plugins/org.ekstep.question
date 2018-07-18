@@ -205,94 +205,89 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     ecEditor.dispatchEvent("metadata:form:onsuccess", {target: '#questionMetaDataTemplate', form: frmScope.metaForm});
   };
   $scope.saveMetaData = function (event, object) {
-  	var metaDataObject = object.formData.metaData;
-  	for (var property in object.formData.metaData) {
-  		if (metaDataObject[property]) {
-  			$scope.questionMetaData[property] = metaDataObject[property];
-  		}
-  	}
-  	var questionFormData = {};
-    var data = {}; // TODO: You have to get this from Q.Unit plugin(getData())
-    data.plugin = $scope.selectedTemplatePluginData.plugin;
-    data.data = $scope.questionCreationFormData; 
-
-    var outRelations = [];
-    _.each($scope.questionMetaData.concepts, function(concept){
-      outRelations.push({
-        "endNodeId": concept.identifier,
-        "relationType": "associatedTo"
-      })
-    });
-    
-    var metadataObj = $scope.questionMetaData;    
-    metadataObj.category = $scope.category;
-
-   // var metadataObj = { category: $scope.category, title:  $scope.questionMetaData.name, medium: $scope.questionMetaData.medium, qlevel:  $scope.questionMetaData.level, gradeLevel:  $scope.questionMetaData.gradeLevel, concepts:  $scope.questionMetaData.concepts, description:  $scope.questionMetaData.description, max_score:  $scope.questionMetaData.max_score, subject:  $scope.questionMetaData.subject, board:  $scope.questionMetaData.board  };
-
-    data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": $scope.questionCreationFormData.questionCount};
-    data.media = $scope.questionCreationFormData.media;
-    questionFormData.data = data;
-    var metadata = {
-    	"code": "NA",
-    	"name": $scope.questionMetaData.name,
-      "title": $scope.questionMetaData.name,
-      "qlevel": $scope.questionMetaData.level,
-    	"question": $scope.questionCreationFormData.question.text,
-    	"isShuffleOption" : $scope.questionData.isShuffleOption,
-    	"body": JSON.stringify(questionFormData),
-    	"itemType": "UNIT",
-    	"version": 2,
-    	"category": $scope.category,
-    	"description": $scope.questionMetaData.description,
-    	"createdBy": window.context.user.id,
-    	"channel": ecEditor.getContext('channel'),
-      "type": $scope.category.toLowerCase(), // backward compatibility
-      "template": "NA", // backward compatibility
-      "template_id": "NA", // backward compatibility
-      "topic":  $scope.questionMetaData.topic,
-      //"framework": "mh_k-12_15"
-      "framework": ecEditor.getContext('framework')
-    };
-
-    var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
-    var mtfoptions = [{
-    	"value": {
-    		"type": "mixed",
-    		"text": "इक",
-    		"image": "",
-    		"count": "",
-    		"audio": "",
-    		"resvalue": "इक",
-    		"resindex": 0
-    	},
-    	"index": 0
-    }];
-    switch ($scope.category) {
-    	case 'MCQ':
-    	metadata.options = dynamicOptions;
-    	break;
-    	case 'FTB':
-    	metadata.answer = dynamicOptions;
-    	break;
-    	case 'MTF':
-    	metadata.lhs_options = mtfoptions;
-    	metadata.rhs_options = mtfoptions;
-    	break;
-    	default:
-    	metadata.options = dynamicOptions;
-    	break;
+  	if(object.isValid){
+      var metaDataObject = object.formData.metaData;
+      for (var property in object.formData.metaData) {
+        if (metaDataObject[property]) {
+          $scope.questionMetaData[property] = metaDataObject[property];
+        }
+      }
+      var questionFormData = {};
+      var data = {}; // TODO: You have to get this from Q.Unit plugin(getData())
+      data.plugin = $scope.selectedTemplatePluginData.plugin;
+      data.data = $scope.questionCreationFormData; 
+      var outRelations = [];
+      _.each($scope.questionMetaData.concepts, function(concept){
+        outRelations.push({
+          "endNodeId": concept.identifier,
+          "relationType": "associatedTo"
+        })
+      });
+      var metadataObj = $scope.questionMetaData;    
+      metadataObj.category = $scope.category;
+      data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": $scope.questionCreationFormData.questionCount};
+      data.media = $scope.questionCreationFormData.media;
+      questionFormData.data = data;
+      var metadata = {
+        "code": "NA",
+        "name": $scope.questionMetaData.name,
+        "title": $scope.questionMetaData.name,
+        "qlevel": $scope.questionMetaData.level,
+        "question": $scope.questionCreationFormData.question.text,
+        "isShuffleOption" : $scope.questionData.isShuffleOption,
+        "body": JSON.stringify(questionFormData),
+        "itemType": "UNIT",
+        "version": 2,
+        "category": $scope.category,
+        "description": $scope.questionMetaData.description,
+        "createdBy": window.context.user.id,
+        "channel": ecEditor.getContext('channel'),
+        "type": $scope.category.toLowerCase(), // backward compatibility
+        "template": "NA", // backward compatibility
+        "template_id": "NA", // backward compatibility
+        "topic":  $scope.questionMetaData.topic,
+        "framework": ecEditor.getContext('framework')
+      };
+      var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
+      var mtfoptions = [{
+        "value": {
+          "type": "mixed",
+          "text": "इक",
+          "image": "",
+          "count": "",
+          "audio": "",
+          "resvalue": "इक",
+          "resindex": 0
+        },
+        "index": 0
+      }];
+      switch ($scope.category) {
+        case 'MCQ':
+        metadata.options = dynamicOptions;
+        break;
+        case 'FTB':
+        metadata.answer = dynamicOptions;
+        break;
+        case 'MTF':
+        metadata.lhs_options = mtfoptions;
+        metadata.rhs_options = mtfoptions;
+        break;
+        default:
+        metadata.options = dynamicOptions;
+        break;
+      }
+      $scope.qFormData = {
+        "request": {
+          "assessment_item": {
+            "objectType": "AssessmentItem",
+            "metadata": metadata,
+            "outRelations": outRelations
+          }
+        }
+      };
+      /*Save data and get response and dispatch event with response to questionbank plugin*/
+      $scope.saveQuestion($scope.assessmentId, $scope.qFormData);
     }
-    $scope.qFormData = {
-    	"request": {
-    		"assessment_item": {
-    			"objectType": "AssessmentItem",
-    			"metadata": metadata,
-          "outRelations": outRelations
-    		}
-    	}
-    };
-    /*Save data and get response and dispatch event with response to questionbank plugin*/
-    $scope.saveQuestion($scope.assessmentId, $scope.qFormData);
   };
   $scope.saveQuestion = function (assessmentId, data) {
   	ecEditor.getService('assessment').saveQuestionV3(assessmentId, data, function (err, resp) {
