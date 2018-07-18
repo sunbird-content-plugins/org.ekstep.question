@@ -500,27 +500,4 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     }
     ctrl.init();
   }]);
-
-  angular.module('org.ekstep.question').service('questionServices', ['$http', function ($http) {
-    
-    this.invokeAssetBrowser = function(callbackObj) {
-      ecEditor.dispatchEvent('org.ekstep.assetbrowser:show', callbackObj);
-    }
-  
-    this.generateTelemetry = function(data, plugin){
-      if (data) ecEditor.getService('telemetry').interact({
-        "type": data.type,
-        "id": data.id,
-        "pageid": data.form,
-        "target": {
-          "id": data.target.id,
-          "ver": data.target.ver,
-          "type": data.target.type
-        },
-        "plugin": plugin
-      })
-    }
-
-  }]);
-
 //# sourceURL=question.js
