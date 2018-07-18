@@ -227,16 +227,20 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     var metadataObj = $scope.questionMetaData;    
     metadataObj.category = $scope.category;
 
-   // var metadataObj = { category: $scope.category, title:  $scope.questionMetaData.name, medium: $scope.questionMetaData.medium, qlevel:  $scope.questionMetaData.level, gradeLevel:  $scope.questionMetaData.gradeLevel, concepts:  $scope.questionMetaData.concepts, description:  $scope.questionMetaData.description, max_score:  $scope.questionMetaData.max_score, subject:  $scope.questionMetaData.subject, board:  $scope.questionMetaData.board  };
-
-    data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": $scope.questionCreationFormData.questionCount};
+   // TODO: questionCount should be sent from unit template controllers. Currently it is hardcoded to 1.
+    data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": 1};
     data.media = $scope.questionCreationFormData.media;
     questionFormData.data = data;
     var metadata = {
     	"code": "NA",
     	"name": $scope.questionMetaData.name,
       "title": $scope.questionMetaData.name,
+      "medium": $scope.questionMetaData.medium,
+      "max_score": $scope.questionData.questionMaxScore,
       "qlevel": $scope.questionMetaData.level,
+      "gradeLevel": $scope.questionMetaData.gradeLevel,
+      "subject": $scope.questionMetaData.subject,
+      "board": $scope.questionMetaData.board,
     	"question": $scope.questionCreationFormData.question.text,
     	"isShuffleOption" : $scope.questionData.isShuffleOption,
     	"body": JSON.stringify(questionFormData),
