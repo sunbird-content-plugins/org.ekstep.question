@@ -173,9 +173,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     	$scope.questionData.questionTitle = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text : $scope.questionData.questionTitle;
     }
     $scope.questionData.questionTitle = $scope.extractHTML($scope.questionData.questionTitle);
-    $scope.questionMetaData.title = $scope.questionData.questionTitle;
+    $scope.questionMetaData.name = $scope.questionData.questionTitle;
     $scope.questionMetaData.medium = $scope.questionData.qcMedium;
-    $scope.questionMetaData.qlevel = $scope.questionData.qcLevel;
+    $scope.questionMetaData.level = $scope.questionData.qcLevel;
     $scope.questionMetaData.description = $scope.questionData.questionDesc;
     $scope.questionMetaData.max_score = $scope.questionData.questionMaxScore;
     $scope.questionMetaData.gradeLevel = $scope.questionData.qcGrade;
