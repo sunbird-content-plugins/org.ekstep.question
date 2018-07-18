@@ -155,7 +155,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       metaFormScope.isSubmit = false;
   		$scope.questionData.questionTitle = metaFormScope.contentMeta.name;
   		$scope.questionData.qcMedium = metaFormScope.contentMeta.medium;
-  		$scope.questionData.qcLevel = metaFormScope.contentMeta.level;
+  		$scope.questionData.qcLevel = metaFormScope.contentMeta.qlevel;
   		$scope.questionData.questionDesc = metaFormScope.contentMeta.description;
   		$scope.questionData.questionMaxScore = metaFormScope.contentMeta.max_score;
   		$scope.questionData.qcGrade = metaFormScope.contentMeta.gradeLevel;
@@ -175,7 +175,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     $scope.questionData.questionTitle = $scope.extractHTML($scope.questionData.questionTitle);
     $scope.questionMetaData.name = $scope.questionData.questionTitle;
     $scope.questionMetaData.medium = $scope.questionData.qcMedium;
-    $scope.questionMetaData.level = $scope.questionData.qcLevel;
+    $scope.questionMetaData.qlevel = $scope.questionData.qcLevel;
     $scope.questionMetaData.description = $scope.questionData.questionDesc;
     $scope.questionMetaData.max_score = $scope.questionData.questionMaxScore;
     $scope.questionMetaData.gradeLevel = $scope.questionData.qcGrade;
