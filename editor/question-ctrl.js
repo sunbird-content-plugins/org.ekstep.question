@@ -225,13 +225,19 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       });
       var metadataObj = $scope.questionMetaData;    
       metadataObj.category = $scope.category;
-      data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": $scope.questionCreationFormData.questionCount};
+      // TODO: questionCount should be sent from unit template controllers. Currently it is hardcoded to 1.
+      data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": 1};
       data.media = $scope.questionCreationFormData.media;
       questionFormData.data = data;
       var metadata = {
         "code": "NA",
         "name": $scope.questionMetaData.name,
         "title": $scope.questionMetaData.name,
+        "medium": $scope.questionMetaData.medium,
+        "max_score": $scope.questionData.questionMaxScore,
+        "gradeLevel": $scope.questionMetaData.gradeLevel,
+        "subject": $scope.questionMetaData.subject,
+        "board": $scope.questionMetaData.board,
         "qlevel": $scope.questionMetaData.level,
         "question": $scope.questionCreationFormData.question.text,
         "isShuffleOption" : $scope.questionData.isShuffleOption,
