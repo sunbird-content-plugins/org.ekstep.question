@@ -155,7 +155,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       metaFormScope.isSubmit = false;
   		$scope.questionData.questionTitle = metaFormScope.contentMeta.name;
   		$scope.questionData.qcMedium = metaFormScope.contentMeta.medium;
-  		$scope.questionData.qcLevel = metaFormScope.contentMeta.level;
+  		$scope.questionData.qcLevel = metaFormScope.contentMeta.qlevel;
   		$scope.questionData.questionDesc = metaFormScope.contentMeta.description;
   		$scope.questionData.questionMaxScore = metaFormScope.contentMeta.max_score;
   		$scope.questionData.qcGrade = metaFormScope.contentMeta.gradeLevel;
@@ -173,7 +173,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     	$scope.questionData.questionTitle = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text : $scope.questionData.questionTitle;
     }
     $scope.questionData.questionTitle = $scope.extractHTML($scope.questionData.questionTitle);
-    $scope.questionMetaData.title = $scope.questionData.questionTitle;
+    $scope.questionMetaData.name = $scope.questionData.questionTitle;
     $scope.questionMetaData.medium = $scope.questionData.qcMedium;
     $scope.questionMetaData.qlevel = $scope.questionData.qcLevel;
     $scope.questionMetaData.description = $scope.questionData.questionDesc;
@@ -334,13 +334,13 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	if (questionData1.data.config.metadata.concepts) {
   		$scope.Totalconcepts = questionData1.data.config.metadata.concepts.length;
   	}
-    if (questionData1.data.config.metadata.topic) {
-      $scope.Totaltopics = questionData1.data.config.metadata.topic.length;
+    if (questionData.topic) {
+      $scope.Totaltopics = questionData.topic.length;
     }
     $scope.questionData.concepts = questionData1.data.config.metadata.concepts;
-  	$scope.questionData.topic = questionData1.data.config.metadata.topic;
+  	$scope.questionData.topic = questionData.topic;
     $scope.selectedConceptsData = questionData1.data.config.metadata.concepts;
-  	$scope.selectedTopicsData = questionData1.data.config.metadata.topic;
+  	$scope.selectedTopicsData = questionData.topic;
   	$scope.questionData.questionDesc = questionData1.data.config.metadata.description;
   	$scope.questionData.questionMaxScore = questionData1.data.config.metadata.max_score;
   	$scope.conceptsCheck = true;
