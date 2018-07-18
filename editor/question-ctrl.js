@@ -175,7 +175,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     $scope.questionData.questionTitle = $scope.extractHTML($scope.questionData.questionTitle);
     $scope.questionMetaData.name = $scope.questionData.questionTitle;
     $scope.questionMetaData.medium = $scope.questionData.qcMedium;
-    $scope.questionMetaData.qlevel = $scope.questionData.qcLevel;
+    $scope.questionMetaData.level = $scope.questionData.qcLevel;
     $scope.questionMetaData.description = $scope.questionData.questionDesc;
     $scope.questionMetaData.max_score = $scope.questionData.questionMaxScore;
     $scope.questionMetaData.gradeLevel = $scope.questionData.qcGrade;
@@ -235,6 +235,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     var metadata = {
     	"code": "NA",
     	"name": $scope.questionMetaData.name,
+      "title": $scope.questionMetaData.name,
+      "qlevel": $scope.questionMetaData.level,
     	"question": $scope.questionCreationFormData.question.text,
     	"isShuffleOption" : $scope.questionData.isShuffleOption,
     	"body": JSON.stringify(questionFormData),
@@ -248,15 +250,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       "template": "NA", // backward compatibility
       "template_id": "NA", // backward compatibility
       "topic":  $scope.questionMetaData.topic,
-      //"framework": "NCFCOPY"
+      //"framework": "mh_k-12_15"
       "framework": ecEditor.getContext('framework')
     };
-
-     for (var key in $scope.questionMetaData) {
-        if ($scope.questionMetaData.hasOwnProperty(key)) {
-          metadata[key] = $scope.questionMetaData[key];
-        }
-      }
 
     var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
     var mtfoptions = [{
@@ -322,8 +318,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	$scope.questionData = questionData1;
   	$scope.questionCreationFormData = questionData1.data.data;
   	$scope.questionData.qcMedium = questionData1.data.config.metadata.medium;
-  	$scope.questionData.questionTitle = questionData1.data.config.metadata.title;
-  	$scope.questionData.qcLevel = questionData1.data.config.metadata.qlevel;
+  	$scope.questionData.questionTitle = questionData.title;
+  	$scope.questionData.qcLevel = questionData.qlevel;
   	$scope.questionData.subject = questionData1.data.config.metadata.subject;
   	$scope.questionData.board = questionData1.data.config.metadata.board;
   	$scope.questionData.templateType = questionData1.data.config.layout;
