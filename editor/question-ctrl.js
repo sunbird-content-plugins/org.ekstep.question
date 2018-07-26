@@ -1,42 +1,39 @@
 angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
-	.controller('QuestionCreationFormController', ['$scope', 'instance', 'questionData', function ($scope, instance, questionData) {
-		$scope.templatesScreen = true;
-		$scope.questionMetadataScreen = false;
-		$scope.Totalconcepts = 0;
-		$scope.Totaltopics = 0;
-		$scope.category = '';
-		$scope.editState = false;
-		$scope.questionUnitTemplateURL = '';
-		$scope.questionTemplates = [];
-		$scope.templatesNotFound = '';
-		$scope.selectedTemplatePluginData = {};
-		$scope.templatesType = ['Horizontal', 'Vertical', 'Grid'];
-		$scope._constants = {
-			previewPlugin: 'org.ekstep.questionset.preview',
-			questionPlugin: 'org.ekstep.question',
-			questionsetPlugin: 'org.ekstep.questionset',
-			questionbankPlugin: 'org.ekstep.questionbank'
-		};
-		$scope.questionData = { 'questionMaxScore': 1 };
-		$scope.questionData.isShuffleOption = false;
-		$scope.questionData.isPartialScore = true;
-		$scope.questionData.templateType = $scope.templatesType[0];
-		$scope.questionMetaData = {};
+.controller('QuestionCreationFormController', ['$scope', 'instance', 'questionData', function ($scope, instance, questionData) {
+	$scope.templatesScreen = true;
+	$scope.questionMetadataScreen = false;
+	$scope.Totalconcepts = 0;
+	$scope.Totaltopics = 0;
+	$scope.category = '';
+	$scope.editState = false;
+	$scope.questionUnitTemplateURL = '';
+	$scope.questionTemplates = [];
+	$scope.templatesNotFound = '';
+	$scope.selectedTemplatePluginData = {};
+	$scope.templatesType = ['Horizontal', 'Vertical', 'Grid'];
+	$scope._constants = {
+		previewPlugin: 'org.ekstep.questionset.preview',
+		questionPlugin: 'org.ekstep.question',
+		questionsetPlugin: 'org.ekstep.questionset',
+		questionbankPlugin: 'org.ekstep.questionbank'
+	};
+	$scope.questionData = {'questionMaxScore': 1};
+	$scope.questionData.isShuffleOption = false;
+	$scope.questionData.isPartialScore = true;
+	$scope.questionData.templateType = $scope.templatesType[0];
+	$scope.questionMetaData = {};
 
-		$scope.init = function () {
-			ecEditor.addEventListener('editor:template:loaded', function (event, object) {
-				if (object.formAction == 'question-meta-save') {
-					ecEditor.dispatchEvent('metadata:controller:init');
-					$scope.metadataform = object.templatePath;
-				}
-			});
-			if (!ecEditor._.isEmpty(questionData)) {
-				$scope.showQuestionForm(questionData);
-			} else {
-				$scope.showTemplates();
+	$scope.init = function () {
+		ecEditor.addEventListener('editor:template:loaded', function (event, object) {
+			if(object.formAction == 'question-meta-save') {
+        ecEditor.dispatchEvent('metadata:controller:init');
+				$scope.metadataform = object.templatePath;
 			}
-			EventBus.listeners['editor:form:data'] = undefined;
-			ecEditor.addEventListener('editor:form:success', $scope.saveMetaData);
+		});
+		if (!ecEditor._.isEmpty(questionData)) {
+			$scope.showQuestionForm(questionData);
+		} else {
+			$scope.showTemplates();
 		}
 		EventBus.listeners['editor:form:success'] = undefined;
 		ecEditor.addEventListener('editor:form:success', $scope.saveMetaData);
@@ -79,79 +76,25 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 			"version": obj.ver,
 			"templateId": obj.editor.template
 		};
-		$scope.cancel = function () {
-			$scope.closeThisDialog();
-		}
-		$scope.back = function () {
-			if (!$scope.questionMetadataScreen) {
-				$scope.questionMetadataScreen = true;
-				$scope.templatesScreen = true;
-				$scope.showTemplates();
-			} else {
-				var metaFormScope = $('#question-meta-form #content-meta-form').scope();
-				metaFormScope.isSubmit = false;
-				$scope.questionData.questionTitle = metaFormScope.contentMeta.name;
-				$scope.questionData.qcMedium = metaFormScope.contentMeta.medium;
-				$scope.questionData.qcLevel = metaFormScope.contentMeta.qlevel;
-				$scope.questionData.questionDesc = metaFormScope.contentMeta.description;
-				$scope.questionData.questionMaxScore = metaFormScope.contentMeta.max_score;
-				$scope.questionData.qcGrade = metaFormScope.contentMeta.gradeLevel;
-				$scope.questionData.concepts = metaFormScope.contentMeta.concepts;
-				$scope.questionData.topic = metaFormScope.contentMeta.topic;
-				$scope.questionMetadataScreen = false;
-			}
-		}
-		$scope.formIsValid = function () {
-			$scope.questionMetadataScreen = true;
-			//comment because in edit question the question and question title are not
-			if ($scope.category == 'FTB') {
-				$scope.questionData.questionTitle = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text.replace(/\[\[.*?\]\]/g, '____') : $scope.questionData.questionTitle;
-			} else {
-				$scope.questionData.questionTitle = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text : $scope.questionData.questionTitle;
-			}
-			$scope.questionData.questionTitle = $scope.extractHTML($scope.questionData.questionTitle);
-			$scope.questionMetaData.name = $scope.questionData.questionTitle;
-			$scope.questionMetaData.medium = $scope.questionData.qcMedium;
-			$scope.questionMetaData.qlevel = $scope.questionData.qcLevel;
-			$scope.questionMetaData.description = $scope.questionData.questionDesc;
-			$scope.questionMetaData.max_score = $scope.questionData.questionMaxScore;
-			$scope.questionMetaData.gradeLevel = $scope.questionData.qcGrade;
-			$scope.questionMetaData.concepts = $scope.questionData.concepts;
-			$scope.questionMetaData.topic = $scope.questionData.topic;
-			$scope.questionMetaData.subject = $scope.questionData.subject;
-			$scope.questionMetaData.board = $scope.questionData.board;
-			if ($scope.questionMetaData.concepts) {
-				$scope.questionMetaData.conceptData = "(" + $scope.questionData.concepts.length + ") concepts selected";
-			}
-			if ($scope.questionMetaData.topic) {
-				$scope.questionMetaData.topicData = "(" + $scope.questionData.topic.length + ") topics selected";
-			}
-			ecEditor.dispatchEvent('org.ekstep.editcontentmeta:showpopup', {
-				action: 'question-meta-save',
-				subType: 'questions',
-				framework: ecEditor.getContext('framework'),
-				rootOrgId: ecEditor.getContext('channel'),
-				type: 'content',
-				popup: false,
-				metadata: $scope.questionMetaData
-			});
-		}
-		$scope.sendMetaData = function () {
-			var formElement = $("#questionMetaDataTemplate").find("#content-meta-form");
-			var frmScope = formElement.scope();
-			ecEditor.dispatchEvent("metadata:form:onsuccess", { target: '#questionMetaDataTemplate', form: frmScope.metaForm });
-		};
-		$scope.saveMetaData = function (event, object) {
-			var metaDataObject = object.formData.metaData;
-			for (var property in object.formData.metaData) {
-				if (metaDataObject[property]) {
-					$scope.questionMetaData[property] = metaDataObject[property];
-				}
-			}
-			var questionFormData = {};
-			var data = {}; // TODO: You have to get this from Q.Unit plugin(getData())
-			data.plugin = $scope.selectedTemplatePluginData.plugin;
-			data.data = $scope.questionCreationFormData;
+		var pluginInstance = $scope.createPluginInstance(obj.pluginID);
+		pluginInstance._data = {};
+		$scope.unitPlugin = obj.pluginID;
+		$scope.pluginVer = obj.ver;
+		$scope.templateId = obj.editor.template;
+		var templatePath = ecEditor.resolvePluginResource(obj.pluginID, obj.ver, obj.editor.templateURL);
+		$scope.questionUnitTemplateURL = templatePath + '?BUILDNUMBER';
+	}
+	$scope.showMetaform = function () {
+		$scope.refreshPreview = false;
+		$scope.validateQuestionCreationForm();
+	}
+	$scope.createPluginInstance = function(pluginId){
+		return ecEditor.instantiatePlugin(pluginId);
+	}
+	$scope.validateQuestionCreationForm = function(){
+  	var pluginInstance = $scope.createPluginInstance($scope.selectedTemplatePluginData.plugin.id); // Plugin id is based on template choosen
+  	pluginInstance.validateForm($scope.validatedForm);
+  }
 
   $scope.validatedForm = function(isFormValid,data){
   	if(isFormValid){
@@ -455,4 +398,4 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   $scope.init();
 }]);
 
-//# sourceURL=question-ctrl.js
+//# sourceURL=questionCtrl.js
