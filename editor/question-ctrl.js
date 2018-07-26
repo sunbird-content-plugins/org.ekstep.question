@@ -20,6 +20,13 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.questionData = {'questionMaxScore': 1};
 	$scope.questionData.isShuffleOption = false;
 	$scope.questionData.isPartialScore = true;
+  $scope.templateIcons = [];
+  _.each($scope.templatesType, function(template, key){
+    $scope.templateIcons.push({
+      "icon": ecEditor.resolvePluginResource(instance.manifest.id, instance.manifest.ver, 'assets/'+template+'.png'),
+      "name": template
+    }); 
+  });
 	$scope.questionData.templateType = $scope.templatesType[0];
 	$scope.questionMetaData = {};
 
@@ -362,6 +369,10 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     pluginInstance.renderForm(questionData1.data);
     $scope.$safeApply();
   };
+  $scope.changeLayout = function(templateType){
+    $scope.questionData.templateType = templateType;
+    $scope.showPreview();
+  }
   $scope.extractHTML = function(htmlElement) {
   	var divElement= document.createElement('div');
   	divElement.innerHTML= htmlElement;
