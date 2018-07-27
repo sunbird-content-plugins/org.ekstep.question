@@ -153,24 +153,21 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
         $scope.templatesScreen = true;
         $scope.showTemplates();
       } else {
-        var metaFormScope = $('#question-meta-form #content-meta-form').scope();
+        var metaFormScope = $("#question-meta-form").find("#content-meta-form").scope();
         metaFormScope.isSubmit = false;
-        $scope.questionData.title = metaFormScope.contentMeta.name;
 
-        /*$scope.questionData.medium = metaFormScope.contentMeta.medium;
-      $scope.questionData.qlevel = metaFormScope.contentMeta.level;
-      $scope.questionData.description = metaFormScope.contentMeta.description;
-      $scope.questionData.max_score = metaFormScope.contentMeta.max_score;
-      $scope.questionData.gradeLevel = metaFormScope.contentMeta.gradeLevel;
-      $scope.questionData.concepts = metaFormScope.contentMeta.concepts;*/
+        for (var key in metaFormScope.contentMeta) {
+          if (metaFormScope.contentMeta.hasOwnProperty(key)) {
+            if (key == 'name') {
+             $scope.questionData['title'] = metaFormScope.contentMeta['name'];
+            }else{
+               $scope.questionData[key] = metaFormScope.contentMeta[key];
+            }
+          }
+        }
 
-        $scope.questionData.medium = metaFormScope.contentMeta.medium;
-        $scope.questionData.qlevel = metaFormScope.contentMeta.qlevel;
-        $scope.questionData.description = metaFormScope.contentMeta.description;
-        $scope.questionData.questionMaxScore = metaFormScope.contentMeta.max_score;
-        $scope.questionData.qcGrade = metaFormScope.contentMeta.gradeLevel;
-        $scope.questionData.concepts = metaFormScope.contentMeta.concepts;
-        $scope.questionData.topic = metaFormScope.contentMeta.topic;
+
+
         $scope.questionMetadataScreen = false;
       }
     }
@@ -199,11 +196,11 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       if ($scope.questionMetaData.topic) {
         $scope.questionMetaData.topicData = "(" + $scope.questionData.topic.length + ") topics selected";
       }
-      ecEditor.dispatchEvent('org.ekstep.editcontentmeta:showpopup', {
+      ecEditor.dispatchEvent('org.ekstep.editcontentmeta:showpopup1', {
         action: 'question-meta-save',
         subType: 'questions',
         framework: ecEditor.getContext('framework'),
-        rootOrgId: ecEditor.getContext('channel'),
+        rootOrgId: ecEditor.getContext('channel')
         type: 'content',
         popup: false,
         metadata: $scope.questionMetaData
@@ -237,7 +234,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
         var metadataObj = $scope.questionMetaData;
         metadataObj.category = $scope.category;
         // TODO: questionCount should be sent from unit template controllers. Currently it is hardcoded to 1.
-        data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption": $scope.questionData.isShuffleOption, "questionCount": 1 };
+        data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.max_score, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption": $scope.questionData.isShuffleOption, "questionCount": 1 };
         data.media = $scope.questionCreationFormData.media;
         questionFormData.data = data;
         var metadata = {
