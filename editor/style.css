@@ -13,6 +13,7 @@
 
 .qc-ngdialog-custome > .ngdialog-content {
     top: 0% !important;
+    font-family: Helvetica,sans-serif;
 }
 
 .item:hover {
@@ -266,4 +267,8 @@ color: white;
 
 .formDiv{
     overflow: auto;
+}
+.previewArea{
+    height: 80vh;
+    overflow-y:auto; 
 }
