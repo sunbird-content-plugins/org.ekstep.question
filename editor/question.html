@@ -77,14 +77,14 @@
                         </div>
                     </div>
                     <div class="previewAreaHead" ng-init="loadDropdown()"
-                         ng-show="selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.mcq' || selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.mtf'">
+                         ng-show="selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.mcq'">
                         <div class="preview-heading">
                             <h3 class="ui left floated previewHeading">Configuration</h3>
                         </div>
-                        <label class="qcMetadateFormLbl">
+                        <label class="qcMetadateFormLbl pull-left">
                             Select layout <span class="star">&nbsp;*</span>
                         </label>
-                        <select class="ui dropdown form-control" name="templateType"
+                        <select class="ui dropdown form-control pull-left" name="templateType"
                                 ng-model="questionData.templateType" ng-change="updatePreview();"  ng-click="generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
                             <option ng-repeat="tem in templatesType" value="{{tem}}">{{tem}}</option>
                         </select>
@@ -103,7 +103,7 @@
                             <h3 class="ui left floated previewHeading">Configuration</h3>
                         </div>
                         <div class="pull-left" ng-show="selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.mtf'">
-                            <label class="qcMetadateFormLbl">
+                            <label class="qcMetadateFormLbl pull-left">
                                 Select layout <span class="star">&nbsp;*</span>
                             </label>
                             <select class="ui dropdown form-control" name="templateType"
