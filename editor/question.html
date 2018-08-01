@@ -81,14 +81,21 @@
                         <div class="preview-heading">
                             <h3 class="ui left floated previewHeading">Configuration</h3>
                         </div>
-                        <label class="qcMetadateFormLbl">
-                            Select layout <span class="star">&nbsp;*</span>
-                        </label>
-                        <select class="ui dropdown form-control" name="templateType"
-                                ng-model="questionData.templateType" ng-change="updatePreview();"  ng-click="generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
-                            <option ng-repeat="tem in templatesType" value="{{tem}}">{{tem}}</option>
-                        </select>
-                        <div>
+                        
+
+                        <div class="ui twelve column preview-heading">
+                            <div class="qcMetadateFormLbl">
+                                Select layout<span class="star">&nbsp;*</span>
+                            </div>
+                            <div class="ui three column grid template-layout">
+                                <div class="row">
+                                    <div class="column" ng-class="{'activetemplate': questionData.templateType == templateIcon.name}" ng-repeat="templateIcon in templateIcons">
+                                        <img class="ui centered tiny image select-template" src="{{templateIcon.icon}}" ng-click="changeLayout(templateIcon.name);"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="preview-heading">
                             <div class="ui label qb-toggle-label">Shuffle Option</div>
                             <div class="ui fluid toggle checkbox verticalcenter">
                                 <input type="checkbox" ng-model="questionData.isShuffleOption"
