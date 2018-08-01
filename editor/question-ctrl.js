@@ -153,14 +153,16 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	} else {
   		var metaFormScope = $('#question-meta-form #content-meta-form').scope();
       metaFormScope.isSubmit = false;
-  		$scope.questionData.questionTitle = metaFormScope.contentMeta.name;
-  		$scope.questionData.qcMedium = metaFormScope.contentMeta.medium;
-  		$scope.questionData.qcLevel = metaFormScope.contentMeta.qlevel;
-  		$scope.questionData.questionDesc = metaFormScope.contentMeta.description;
-  		$scope.questionData.questionMaxScore = metaFormScope.contentMeta.max_score;
-  		$scope.questionData.qcGrade = metaFormScope.contentMeta.gradeLevel;
-  		$scope.questionData.concepts = metaFormScope.contentMeta.concepts;
-  		$scope.questionData.topic = metaFormScope.contentMeta.topic;
+  		for (var key in metaFormScope.contentMeta) {
+        if (metaFormScope.contentMeta.hasOwnProperty(key)) {
+          if (key == 'name') {
+            $scope.questionData['title'] = metaFormScope.contentMeta['name'];
+          } else {
+            $scope.questionData[key] = metaFormScope.contentMeta[key];
+          }
+        }
+       }
+
   		$scope.questionMetadataScreen = false;
   	}
   }
@@ -168,27 +170,27 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	$scope.questionMetadataScreen = true;
     //comment because in edit question the question and question title are not
     if ($scope.category == 'FTB') {
-    	$scope.questionData.questionTitle = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text.replace(/\[\[.*?\]\]/g, '____') : $scope.questionData.questionTitle;
-    } else {
-    	$scope.questionData.questionTitle = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text : $scope.questionData.questionTitle;
-    }
-    $scope.questionData.questionTitle = $scope.extractHTML($scope.questionData.questionTitle);
-    $scope.questionMetaData.name = $scope.questionData.questionTitle;
-    $scope.questionMetaData.medium = $scope.questionData.qcMedium;
-    $scope.questionMetaData.level = $scope.questionData.qcLevel;
-    $scope.questionMetaData.description = $scope.questionData.questionDesc;
-    $scope.questionMetaData.max_score = $scope.questionData.questionMaxScore;
-    $scope.questionMetaData.gradeLevel = $scope.questionData.qcGrade;
-    $scope.questionMetaData.concepts = $scope.questionData.concepts;
-    $scope.questionMetaData.topic = $scope.questionData.topic;
-    $scope.questionMetaData.subject = $scope.questionData.subject;
-    $scope.questionMetaData.board = $scope.questionData.board;
-    if ($scope.questionMetaData.concepts) {
-    	$scope.questionMetaData.conceptData = "(" + $scope.questionData.concepts.length + ") concepts selected";
-    }
-    if ($scope.questionMetaData.topic) {
-      $scope.questionMetaData.topicData = "(" + $scope.questionData.topic.length + ") topics selected";
-    }
+        $scope.questionData.title = _.isUndefined($scope.questionData.title) ? $scope.questionCreationFormData.question.text.replace(/\[\[.*?\]\]/g, '____') : $scope.questionData.title;
+      } else {
+        $scope.questionData.title = _.isUndefined($scope.questionData.title) ? $scope.questionCreationFormData.question.text : $scope.questionData.title;
+      }
+      $scope.questionData.title = $scope.extractHTML($scope.questionData.title);
+
+
+      for (var key in $scope.questionData) {
+        if ($scope.questionData.hasOwnProperty(key)) {
+          if (key == 'title') {
+            $scope.questionMetaData['name'] = $scope.questionData['title'];
+          }
+          $scope.questionMetaData[key] = $scope.questionData[key];
+        }
+      }
+      if ($scope.questionMetaData.concepts) {
+        $scope.questionMetaData.conceptData = "(" + $scope.questionData.concepts.length + ") concepts selected";
+      }
+      if ($scope.questionMetaData.topic) {
+        $scope.questionMetaData.topicData = "(" + $scope.questionData.topic.length + ") topics selected";
+      }
     ecEditor.dispatchEvent('org.ekstep.editcontentmeta:showpopup', {
     	action: 'question-meta-save',
     	subType: 'questions',
@@ -199,7 +201,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     	metadata: $scope.questionMetaData
     });
   }
-  $scope.sendMetaData = function () {
+  $scope.sendMetaData = function (newQuestionCreate) {
+    $scope.isNewQuestion = newQuestionCreate;
   	var formElement = $("#questionMetaDataTemplate").find("#content-meta-form");
   	var frmScope = formElement.scope();
     ecEditor.dispatchEvent("metadata:form:onsuccess", {target: '#questionMetaDataTemplate', form: frmScope.metaForm});
@@ -231,15 +234,6 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       questionFormData.data = data;
       var metadata = {
         "code": "NA",
-        "name": $scope.questionMetaData.name,
-        "title": $scope.questionMetaData.name,
-        "medium": $scope.questionMetaData.medium,
-        "max_score": $scope.questionData.questionMaxScore,
-        "gradeLevel": $scope.questionMetaData.gradeLevel,
-        "subject": $scope.questionMetaData.subject,
-        "board": $scope.questionMetaData.board,
-        "qlevel": $scope.questionMetaData.level,
-        "question": $scope.questionCreationFormData.question.text,
         "isShuffleOption" : $scope.questionData.isShuffleOption,
         "body": JSON.stringify(questionFormData),
         "itemType": "UNIT",
@@ -251,9 +245,20 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
         "type": $scope.category.toLowerCase(), // backward compatibility
         "template": "NA", // backward compatibility
         "template_id": "NA", // backward compatibility
-        "topic":  $scope.questionMetaData.topic,
         "framework": ecEditor.getContext('framework')
       };
+      for (var key in $scope.questionMetaData) {
+          if ($scope.questionMetaData.hasOwnProperty(key)) {
+            if (key == 'title') {
+            metadata['name'] = $scope.questionMetaData['title'];
+            }
+            if(key == 'level'){
+              metadata['qlevel'] = $scope.questionMetaData['level'];
+            }else{
+              metadata[key] = $scope.questionMetaData[key];
+            }
+          }
+        }
       var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
       var mtfoptions = [{
         "value": {
@@ -299,9 +304,16 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	ecEditor.getService('assessment').saveQuestionV3(assessmentId, data, function (err, resp) {
   		if (!err) {
   			var qMetadata = $scope.qFormData.request.assessment_item.metadata;
-  			qMetadata.identifier = resp.data.result.node_id;
-  			ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
-  			$scope.closeThisDialog();
+          qMetadata.identifier = resp.data.result.node_id;
+          if ($scope.isNewQuestion) {
+            $scope.templatesScreen = true;
+            $scope.questionMetadataScreen = false;
+            delete $scope.questionData.title;
+            $scope.$safeApply();
+          } else {
+            ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
+            $scope.closeThisDialog();
+          }
   		} else {
   			ecEditor.dispatchEvent("org.ekstep.toaster:error", {
   				title: 'Failed to save question...',
