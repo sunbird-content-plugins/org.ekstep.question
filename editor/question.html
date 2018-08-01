@@ -128,16 +128,20 @@
                         ng-click="back();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-back', ver: '', type: 'button'}})">
                     Back
                 </button>
+                <div class="or" ng-show="!templatesScreen && questionMetadataScreen"></div>
+                <button class="ui large blue button" ng-if="questionMetadataScreen" id="save-question-button"
+                        ng-click="sendMetaData(true);generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
+                    Save and Create
+                </button>
                 <div class="or" ng-show="!templatesScreen"></div>
                 <button class="ui large blue button" ng-show="!questionMetadataScreen && !templatesScreen" id="next-button"
                         ng-click="showMetaform();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-next', ver: '', type: 'button'}});genImpressionTelemetry({type: 'edit', subtype: 'Paginate', pageid: 'question-creation-form', visits: {objid: 'meta-data-form', objtype: 'form'}});">
                     Next
                 </button>
                 <button class="ui large blue button" ng-if="questionMetadataScreen" id="save-question-button"
-                        ng-click="sendMetaData();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
+                        ng-click="sendMetaData(false);generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
                     Submit
                 </button>
-
             </div>
         </div>
     </div>
