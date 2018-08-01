@@ -87,10 +87,6 @@
                             <div class="qcMetadateFormLbl">
                                 Select layout<span class="star">&nbsp;*</span>
                             </div>
-                            <!-- <select class="ui dropdown form-control" name="templateType"
-                                    ng-model="questionData.templateType" ng-change="updatePreview();"  ng-click="generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
-                                <option ng-repeat="tem in templatesType" value="{{tem}}">{{tem}}</option>
-                            </select> -->
                             <div class="ui three column grid template-layout">
                                 <div class="row">
                                     <div class="column" ng-class="{'activetemplate': questionData.templateType == templateIcon.name}" ng-repeat="templateIcon in templateIcons">
