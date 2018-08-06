@@ -42,8 +42,12 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		} else {
 			$scope.showTemplates();
 		}
-		EventBus.listeners['editor:form:success'] = undefined;
-		ecEditor.addEventListener('editor:form:success', $scope.saveMetaData);
+		
+    //Listener 'editor:form:success' making scope specific and if already added to EventBus dont add if not added add to EventBus
+    $scope.IsEventListened = EventBus.hasEventListener('editor:form:success', $scope.saveMetaData, $scope)
+     if(!$scope.IsEventListened){
+       ecEditor.addEventListener('editor:form:success', $scope.saveMetaData);
+     }
 	}
 	$scope.showTemplates = function() {
 		$scope.templatesScreen = true;
