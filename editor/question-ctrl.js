@@ -22,8 +22,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.questionData.isPartialScore = true;
   $scope.templateIcons = [];
   _.each($scope.templatesType, function(template, key){
+    var templateIconName = template.toLowerCase();
     $scope.templateIcons.push({
-      "icon": ecEditor.resolvePluginResource(instance.manifest.id, instance.manifest.ver, 'assets/'+template+'.png'),
+      "icon": ecEditor.resolvePluginResource(instance.manifest.id, instance.manifest.ver, 'assets/'+templateIconName+'.png'),
       "name": template
     }); 
   });
@@ -130,7 +131,6 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	questions.push(qObj);
   	data[$scope._constants.questionsetPlugin][$scope._constants.questionPlugin] = questions;
   	confData = {"contentBody": {}, "parentElement": true, "element": "#iframeArea"};
-  	document.getElementById("iframeArea").contentDocument.location.reload(true);
   	var pluginInstances = ecEditor.getPluginInstances();
   	var previewInstance = _.find(pluginInstances, function (pi) {
   		return pi.manifest.id === $scope._constants.previewPlugin
