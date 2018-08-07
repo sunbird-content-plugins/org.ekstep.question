@@ -15,7 +15,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		previewPlugin: 'org.ekstep.questionset.preview',
 		questionPlugin: 'org.ekstep.question',
 		questionsetPlugin: 'org.ekstep.questionset',
-		questionbankPlugin: 'org.ekstep.questionbank'
+		questionbankPlugin: 'org.ekstep.questionbank',
+    formElementId: '#questionMetaDataTemplate',
+    metadataFormName: 'questionMetaDataTemplate'
 	};
 	$scope.questionData = {'questionMaxScore': 1};
 	$scope.questionData.isShuffleOption = false;
@@ -43,8 +45,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		} else {
 			$scope.showTemplates();
 		}
-		EventBus.listeners['editor:form:success'] = undefined;
-		ecEditor.addEventListener('editor:form:success', $scope.saveMetaData);
+		
+    EventBus.listeners['editor:form:success'] = undefined;
+    ecEditor.addEventListener('editor:form:success', $scope.saveMetaData);
 	}
 	$scope.showTemplates = function() {
 		$scope.templatesScreen = true;
@@ -210,102 +213,104 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   }
   $scope.sendMetaData = function (newQuestionCreate) {
     $scope.isNewQuestion = newQuestionCreate;
-  	var formElement = $("#questionMetaDataTemplate").find("#content-meta-form");
+  	var formElement = $($scope._constants.formElementId).find("#content-meta-form");
   	var frmScope = formElement.scope();
-    ecEditor.dispatchEvent("metadata:form:onsuccess", {target: '#questionMetaDataTemplate', form: frmScope.metaForm});
+    ecEditor.dispatchEvent("metadata:form:onsuccess", {target: $scope._constants.formElementId, form: frmScope.metaForm});
   };
   $scope.saveMetaData = function (event, object) {
-  	if(object.isValid){
-      var metaDataObject = object.formData.metaData;
-      for (var property in object.formData.metaData) {
-        if (metaDataObject[property]) {
-          $scope.questionMetaData[property] = metaDataObject[property];
-        }
-      }
-      var questionFormData = {};
-      var data = {}; // TODO: You have to get this from Q.Unit plugin(getData())
-      data.plugin = $scope.selectedTemplatePluginData.plugin;
-      data.data = $scope.questionCreationFormData; 
-      var outRelations = [];
-      _.each($scope.questionMetaData.concepts, function(concept){
-        outRelations.push({
-          "endNodeId": concept.identifier,
-          "relationType": "associatedTo"
-        })
-      });
-      var metadataObj = $scope.questionMetaData;    
-      metadataObj.category = $scope.category;
-      // TODO: questionCount should be sent from unit template controllers. Currently it is hardcoded to 1.
-      data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": 1};
-      data.media = $scope.questionCreationFormData.media;
-      questionFormData.data = data;
-      var metadata = {
-        "code": "NA",
-        "isShuffleOption" : $scope.questionData.isShuffleOption,
-        "body": JSON.stringify(questionFormData),
-        "itemType": "UNIT",
-        "version": 2,
-        "category": $scope.category,
-        "description": $scope.questionMetaData.description,
-        "createdBy": window.context.user.id,
-        "channel": ecEditor.getContext('channel'),
-        "type": $scope.category.toLowerCase(), // backward compatibility
-        "template": "NA", // backward compatibility
-        "template_id": "NA", // backward compatibility
-        "framework": ecEditor.getContext('framework')
-      };
-      for (var key in $scope.questionMetaData) {
-          if ($scope.questionMetaData.hasOwnProperty(key)) {
-            if (key == 'title') {
-            metadata['name'] = $scope.questionMetaData['title'];
-            }
-            if(key == 'level'){
-              metadata['qlevel'] = $scope.questionMetaData['level'];
-            }else{
-              metadata[key] = $scope.questionMetaData[key];
-            }
+    if(object.formData.target && object.formData.target.tempalteName && (object.formData.target.tempalteName.toLowerCase() == $scope._constants.metadataFormName.toLowerCase())){
+     	if(object.isValid){
+        var metaDataObject = object.formData.metaData;
+        for (var property in object.formData.metaData) {
+          if (metaDataObject[property]) {
+            $scope.questionMetaData[property] = metaDataObject[property];
           }
         }
-      var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
-      var mtfoptions = [{
-        "value": {
-          "type": "mixed",
-          "text": "इक",
-          "image": "",
-          "count": "",
-          "audio": "",
-          "resvalue": "इक",
-          "resindex": 0
-        },
-        "index": 0
-      }];
-      switch ($scope.category) {
-        case 'MCQ':
-        metadata.options = dynamicOptions;
-        break;
-        case 'FTB':
-        metadata.answer = dynamicOptions;
-        break;
-        case 'MTF':
-        metadata.lhs_options = mtfoptions;
-        metadata.rhs_options = mtfoptions;
-        break;
-        default:
-        metadata.options = dynamicOptions;
-        break;
-      }
-      $scope.qFormData = {
-        "request": {
-          "assessment_item": {
-            "objectType": "AssessmentItem",
-            "metadata": metadata,
-            "outRelations": outRelations
+        var questionFormData = {};
+        var data = {}; // TODO: You have to get this from Q.Unit plugin(getData())
+        data.plugin = $scope.selectedTemplatePluginData.plugin;
+        data.data = $scope.questionCreationFormData; 
+        var outRelations = [];
+        _.each($scope.questionMetaData.concepts, function(concept){
+          outRelations.push({
+            "endNodeId": concept.identifier,
+            "relationType": "associatedTo"
+          })
+        });
+        var metadataObj = $scope.questionMetaData;    
+        metadataObj.category = $scope.category;
+        // TODO: questionCount should be sent from unit template controllers. Currently it is hardcoded to 1.
+        data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": 1};
+        data.media = $scope.questionCreationFormData.media;
+        questionFormData.data = data;
+        var metadata = {
+          "code": "NA",
+          "isShuffleOption" : $scope.questionData.isShuffleOption,
+          "body": JSON.stringify(questionFormData),
+          "itemType": "UNIT",
+          "version": 2,
+          "category": $scope.category,
+          "description": $scope.questionMetaData.description,
+          "createdBy": window.context.user.id,
+          "channel": ecEditor.getContext('channel'),
+          "type": $scope.category.toLowerCase(), // backward compatibility
+          "template": "NA", // backward compatibility
+          "template_id": "NA", // backward compatibility
+          "framework": ecEditor.getContext('framework')
+        };
+        for (var key in $scope.questionMetaData) {
+            if ($scope.questionMetaData.hasOwnProperty(key)) {
+              if (key == 'title') {
+              metadata['name'] = $scope.questionMetaData['title'];
+              }
+              if(key == 'level'){
+                metadata['qlevel'] = $scope.questionMetaData['level'];
+              }else{
+                metadata[key] = $scope.questionMetaData[key];
+              }
+            }
           }
+        var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
+        var mtfoptions = [{
+          "value": {
+            "type": "mixed",
+            "text": "इक",
+            "image": "",
+            "count": "",
+            "audio": "",
+            "resvalue": "इक",
+            "resindex": 0
+          },
+          "index": 0
+        }];
+        switch ($scope.category) {
+          case 'MCQ':
+          metadata.options = dynamicOptions;
+          break;
+          case 'FTB':
+          metadata.answer = dynamicOptions;
+          break;
+          case 'MTF':
+          metadata.lhs_options = mtfoptions;
+          metadata.rhs_options = mtfoptions;
+          break;
+          default:
+          metadata.options = dynamicOptions;
+          break;
         }
-      };
-      /*Save data and get response and dispatch event with response to questionbank plugin*/
-      $scope.saveQuestion($scope.assessmentId, $scope.qFormData);
-    }
+        $scope.qFormData = {
+          "request": {
+            "assessment_item": {
+              "objectType": "AssessmentItem",
+              "metadata": metadata,
+              "outRelations": outRelations
+            }
+          }
+        };
+        /*Save data and get response and dispatch event with response to questionbank plugin*/
+        $scope.saveQuestion($scope.assessmentId, $scope.qFormData);
+      }
+  }
   };
   $scope.saveQuestion = function (assessmentId, data) {
   	ecEditor.getService('assessment').saveQuestionV3(assessmentId, data, function (err, resp) {
