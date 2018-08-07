@@ -218,7 +218,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     ecEditor.dispatchEvent("metadata:form:onsuccess", {target: $scope._constants.formElementId, form: frmScope.metaForm});
   };
   $scope.saveMetaData = function (event, object) {
-    if(object.formData.target.tempalteName.toLowerCase() == $scope._constants.metadataFormName.toLowerCase()){
+    if(object.formData.target && object.formData.target.tempalteName && (object.formData.target.tempalteName.toLowerCase() == $scope._constants.metadataFormName.toLowerCase())){
      	if(object.isValid){
         var metaDataObject = object.formData.metaData;
         for (var property in object.formData.metaData) {
