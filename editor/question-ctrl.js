@@ -342,14 +342,14 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	$scope.assessmentId = questionData.identifier;
   	$scope.questionData = questionData1;
   	$scope.questionCreationFormData = questionData1.data.data;
-  	$scope.questionData.qcMedium = questionData1.data.config.metadata.medium;
+  	$scope.questionData.medium = questionData1.data.config.metadata.medium;
   	$scope.questionData.questionTitle = questionData.title;
-  	$scope.questionData.qcLevel = questionData.qlevel;
+  	$scope.questionData.level = questionData.qlevel;
   	$scope.questionData.subject = questionData1.data.config.metadata.subject;
   	$scope.questionData.board = questionData1.data.config.metadata.board;
   	$scope.questionData.templateType = questionData1.data.config.layout;
   	$scope.questionData.isPartialScore = questionData1.data.config.partial_scoring;
-  	$scope.questionData.qcGrade = questionData1.data.config.metadata.gradeLevel;
+  	$scope.questionData.gradeLevel = questionData1.data.config.metadata.gradeLevel;
   	$scope.questionData.isShuffleOption = questionData1.data.config.isShuffleOption;
   	$scope.category = questionData.category;
   	if (questionData1.data.config.metadata.concepts) {
@@ -363,7 +363,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     $scope.selectedConceptsData = questionData1.data.config.metadata.concepts;
   	$scope.selectedTopicsData = questionData.topic;
   	$scope.questionData.questionDesc = questionData1.data.config.metadata.description;
-  	$scope.questionData.questionMaxScore = questionData1.data.config.metadata.max_score;
+  	$scope.questionData.max_score = questionData1.data.config.metadata.max_score;
   	$scope.conceptsCheck = true;
   	$scope.topicsCheck = true;
   	var pluginID = questionData1.data.plugin.id;
