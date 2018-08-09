@@ -289,3 +289,7 @@ color: white;
 .select-template{
     cursor: pointer;
 }
+
+.pull-left{
+    float: left;
+}
