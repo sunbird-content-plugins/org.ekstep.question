@@ -42,6 +42,10 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		});
 		if (!ecEditor._.isEmpty(questionData)) {
 			$scope.showQuestionForm(questionData);
+      //Check dom is ready then only play preview
+      angular.element(document).ready(function () {
+        $scope.setPreviewData();
+      });
 		} else {
 			$scope.showTemplates();
 		}
