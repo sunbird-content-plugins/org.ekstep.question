@@ -5,7 +5,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.Totalconcepts = 0;
 	$scope.Totaltopics = 0;
 	$scope.category = '';
-	$scope.editState = false;
+	$scope.editMode = false;
 	$scope.questionUnitTemplateURL = '';
 	$scope.questionTemplates = [];
 	$scope.templatesNotFound = '';
@@ -184,9 +184,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	$scope.questionMetadataScreen = true;
     //comment because in edit question the question and question title are not
     if ($scope.category == 'FTB') {
-        $scope.questionData.title = _.isUndefined($scope.questionData.title) ? $scope.questionCreationFormData.question.text.replace(/\[\[.*?\]\]/g, '____') : $scope.questionData.title;
+        $scope.questionData.title = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text.replace(/\[\[.*?\]\]/g, '____') : $scope.questionData.questionTitle;
       } else {
-        $scope.questionData.title = _.isUndefined($scope.questionData.title) ? $scope.questionCreationFormData.question.text : $scope.questionData.title;
+        $scope.questionData.title = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text : $scope.questionData.questionTitle;
       }
       $scope.questionData.title = $scope.extractHTML($scope.questionData.title);
 
