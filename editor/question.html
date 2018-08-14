@@ -72,7 +72,7 @@
                         </div>
                         <div class="qc-show-preview">
                             <div class="ui raised child preview-iframe-wrapper">
-                                <iframe id="iframeArea" class="iframe-preview" ng-init="loadPreview()"></iframe>
+                                <iframe id="iframeArea" class="iframe-preview"></iframe>
                             </div>
                         </div>
                     </div>
@@ -81,14 +81,19 @@
                         <div class="preview-heading">
                             <h3 class="ui left floated previewHeading">Configuration</h3>
                         </div>
-                        <label class="qcMetadateFormLbl">
-                            Select layout <span class="star">&nbsp;*</span>
-                        </label>
-                        <select class="ui dropdown form-control" name="templateType"
-                                ng-model="questionData.templateType" ng-change="updatePreview();"  ng-click="generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
-                            <option ng-repeat="tem in templatesType" value="{{tem}}">{{tem}}</option>
-                        </select>
-                        <div>
+                        <div class="ui twelve column preview-heading">
+                            <div class="qcMetadateFormLbl">
+                                Select layout<span class="star">&nbsp;*</span>
+                            </div>
+                            <div class="ui three column grid template-layout">
+                                <div class="row">
+                                    <div class="column" ng-class="{'activetemplate': questionData.templateType == templateIcon.name}" ng-repeat="templateIcon in templateIcons">
+                                        <img class="ui centered tiny image select-template" src="{{templateIcon.icon}}" ng-click="changeLayout(templateIcon.name);"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="preview-heading">
                             <div class="ui label qb-toggle-label">Shuffle Option</div>
                             <div class="ui fluid toggle checkbox verticalcenter">
                                 <input type="checkbox" ng-model="questionData.isShuffleOption"
@@ -102,13 +107,13 @@
                         <div class="preview-heading">
                             <h3 class="ui left floated previewHeading">Configuration</h3>
                         </div>
-                        <div class="pull-left" ng-show="$ctrl.selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.mtf'">
-                            <label class="qcMetadateFormLbl">
+                        <div class="pull-left" ng-show="selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.mtf'">
+                            <label class="qcMetadateFormLbl pull-left">
                                 Select layout <span class="star">&nbsp;*</span>
                             </label>
                             <select class="ui dropdown form-control" name="templateType"
-                                    ng-model="$ctrl.questionData.templateType" ng-change="$ctrl.updatePreview();"  ng-click="$ctrl.generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
-                                <option ng-repeat="tem in $ctrl.templatesType" value="{{tem}}">{{tem}}</option>
+                                    ng-model="questionData.templateType" ng-change="updatePreview();"  ng-click="generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
+                                <option ng-repeat="tem in templatesType" value="{{tem}}">{{tem}}</option>
                             </select>
                         </div>
                         <div class="ui label qb-toggle-label">Partial Scoring</div>
@@ -130,16 +135,20 @@
                         ng-click="back();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-back', ver: '', type: 'button'}})">
                     Back
                 </button>
+                <div class="or" ng-show="!templatesScreen && questionMetadataScreen"></div>
+                <button class="ui large blue button" ng-if="questionMetadataScreen" id="save-question-button"
+                        ng-click="sendMetaData(true);generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
+                    Save and Create
+                </button>
                 <div class="or" ng-show="!templatesScreen"></div>
                 <button class="ui large blue button" ng-show="!questionMetadataScreen && !templatesScreen" id="next-button"
                         ng-click="showMetaform();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-next', ver: '', type: 'button'}});genImpressionTelemetry({type: 'edit', subtype: 'Paginate', pageid: 'question-creation-form', visits: {objid: 'meta-data-form', objtype: 'form'}});">
                     Next
                 </button>
                 <button class="ui large blue button" ng-if="questionMetadataScreen" id="save-question-button"
-                        ng-click="sendMetaData();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
+                        ng-click="sendMetaData(false);generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
                     Submit
                 </button>
-
             </div>
         </div>
     </div>
