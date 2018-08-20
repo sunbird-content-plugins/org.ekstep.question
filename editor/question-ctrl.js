@@ -10,6 +10,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.questionTemplates = [];
 	$scope.templatesNotFound = '';
 	$scope.selectedTemplatePluginData = {};
+  $scope.savingQuestion = false;
 	$scope.templatesType = ['Horizontal', 'Vertical', 'Grid'];
 	$scope._constants = {
 		previewPlugin: 'org.ekstep.questionset.preview',
@@ -317,8 +318,10 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   }
   };
   $scope.saveQuestion = function (assessmentId, data) {
+    $scope.savingQuestion = true;
   	ecEditor.getService('assessment').saveQuestionV3(assessmentId, data, function (err, resp) {
   		if (!err) {
+        $scope.savingQuestion = false;
   			var qMetadata = $scope.qFormData.request.assessment_item.metadata;
           qMetadata.identifier = resp.data.result.node_id;
           if ($scope.isNewQuestion) {
