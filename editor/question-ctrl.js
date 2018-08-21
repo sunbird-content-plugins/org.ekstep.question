@@ -253,6 +253,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
           "isShuffleOption" : $scope.questionData.isShuffleOption,
           "body": JSON.stringify(questionFormData),
           "itemType": "UNIT",
+          "title": $scope.questionMetaData.name,
+          "qlevel": $scope.questionMetaData.level,
           "version": 2,
           "category": $scope.category,
           "description": $scope.questionMetaData.description,
@@ -264,17 +266,10 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
           "framework": ecEditor.getContext('framework')
         };
         for (var key in $scope.questionMetaData) {
-            if ($scope.questionMetaData.hasOwnProperty(key)) {
-              if (key == 'title') {
-              metadata['name'] = $scope.questionMetaData['title'];
-              }
-              if(key == 'level'){
-                metadata['qlevel'] = $scope.questionMetaData['level'];
-              }else{
-                metadata[key] = $scope.questionMetaData[key];
-              }
-            }
+          if (key != 'title' && key != 'level') {
+            metadata[key] = $scope.questionMetaData[key];
           }
+        }
         var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
         var mtfoptions = [{
           "value": {
@@ -328,6 +323,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
             $scope.templatesScreen = true;
             $scope.questionMetadataScreen = false;
             delete $scope.questionData.title;
+            ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
             $scope.$safeApply();
           } else {
             ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
