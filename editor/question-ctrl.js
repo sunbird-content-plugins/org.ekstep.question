@@ -226,6 +226,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     if(object.formData.target && object.formData.target.tempalteName && (object.formData.target.tempalteName.toLowerCase() == $scope._constants.metadataFormName.toLowerCase())){
      	if(object.isValid){
         var metaDataObject = object.formData.metaData;
+        _.extend(metaDataObject, {'title': metaDataObject.name, 'qlevel': metaDataObject.level});
         for (var property in object.formData.metaData) {
           if (metaDataObject[property]) {
             $scope.questionMetaData[property] = metaDataObject[property];
@@ -253,11 +254,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
           "isShuffleOption" : $scope.questionData.isShuffleOption,
           "body": JSON.stringify(questionFormData),
           "itemType": "UNIT",
-          "title": $scope.questionMetaData.name,
-          "qlevel": $scope.questionMetaData.level,
           "version": 2,
           "category": $scope.category,
-          "description": $scope.questionMetaData.description,
           "createdBy": window.context.user.id,
           "channel": ecEditor.getContext('channel'),
           "type": $scope.category.toLowerCase(), // backward compatibility
@@ -266,9 +264,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
           "framework": ecEditor.getContext('framework')
         };
         for (var key in $scope.questionMetaData) {
-          if (key != 'title' && key != 'level') {
-            metadata[key] = $scope.questionMetaData[key];
-          }
+          metadata[key] = $scope.questionMetaData[key];
         }
         var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
         var mtfoptions = [{
