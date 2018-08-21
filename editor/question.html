@@ -131,7 +131,7 @@
                         ng-click="cancel();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-cancel', ver: '', type: 'button'}})">
                     Cancel
                 </button>
-                <button class="ui basic primary button" id="back-button" ng-show="!templatesScreen" ng-disabled="setBackButtonState()"
+                <button class="ui basic primary button" id="back-button" ng-show="!templatesScreen" ng-disabled="editMode && !questionMetadataScreen"
                         ng-click="back();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-back', ver: '', type: 'button'}})">
                     Back
                 </button>
