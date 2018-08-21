@@ -155,7 +155,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   };
   $scope.resetPreview = function(){
     var previewInstance = $scope.getPreviewInstance();
-    confData = {"contentBody": {}, "parentElement": true, "element": "#iframeArea"};
+    var confData = {"contentBody": {}, "parentElement": true, "element": "#iframeArea"};
     confData.contentBody = previewInstance.resetPreview();
     ecEditor.dispatchEvent("atpreview:show", confData);
   }
