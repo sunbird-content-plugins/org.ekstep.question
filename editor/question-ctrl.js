@@ -121,34 +121,44 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   		}
   	}
   }
+  $scope.getPreviewInstance = function(){
+    var pluginInstances = ecEditor.getPluginInstances();
+    var previewInstance = _.find(pluginInstances, function (pi) {
+      return pi.manifest.id === $scope._constants.previewPlugin
+    });
+    if (_.isUndefined(previewInstance)) {
+      previewInstance = $scope.createPluginInstance($scope._constants.previewPlugin);
+    }
+    return previewInstance;
+  }
   $scope.setPreviewData = function () {
-  	var confData = {};
-  	var qObj = {
-  		"config": '{"metadata":{"title":"question title","description":"question description","medium":"English"},"max_time":0,"max_score":1,"partial_scoring":' + $scope.questionData.isPartialScore + ',"isShuffleOption":' + $scope.questionData.isShuffleOption + ',"layout":' + JSON.stringify($scope.questionData.templateType) + '}',
-  		"data": JSON.stringify($scope.questionCreationFormData),
-  		"id": "c943d0a907274471a0572e593eab49c2",
-  		"pluginId": $scope.selectedTemplatePluginData.plugin.id,
-  		"pluginVer": $scope.selectedTemplatePluginData.plugin.version,
-  		"templateId": $scope.selectedTemplatePluginData.plugin.templateId,
-  		"type": "unit"
-  	}
-  	var questions = [];
-  	var data = {
-  		"org.ekstep.questionset": {}
-  	};
-  	questions.push(qObj);
-  	data[$scope._constants.questionsetPlugin][$scope._constants.questionPlugin] = questions;
-  	confData = {"contentBody": {}, "parentElement": true, "element": "#iframeArea"};
-  	var pluginInstances = ecEditor.getPluginInstances();
-  	var previewInstance = _.find(pluginInstances, function (pi) {
-  		return pi.manifest.id === $scope._constants.previewPlugin
-  	});
-  	if (_.isUndefined(previewInstance)) {
-  		previewInstance = $scope.createPluginInstance($scope._constants.previewPlugin);
-  	}
-  	confData.contentBody = previewInstance.getQuestionPreviwContent(data[$scope._constants.questionsetPlugin]);
-  	ecEditor.dispatchEvent("atpreview:show", confData);
+    var confData = {};
+    var qObj = {
+      "config": '{"metadata":{"title":"question title","description":"question description","medium":"English"},"max_time":0,"max_score":1,"partial_scoring":' + $scope.questionData.isPartialScore + ',"isShuffleOption":' + $scope.questionData.isShuffleOption + ',"layout":' + JSON.stringify($scope.questionData.templateType) + '}',
+      "data": JSON.stringify($scope.questionCreationFormData),
+      "id": "c943d0a907274471a0572e593eab49c2",
+      "pluginId": $scope.selectedTemplatePluginData.plugin.id,
+      "pluginVer": $scope.selectedTemplatePluginData.plugin.version,
+      "templateId": $scope.selectedTemplatePluginData.plugin.templateId,
+      "type": "unit"
+    }
+    var questions = [];
+    var data = {
+      "org.ekstep.questionset": {}
+    };
+    questions.push(qObj);
+    data[$scope._constants.questionsetPlugin][$scope._constants.questionPlugin] = questions;
+    confData = {"contentBody": {}, "parentElement": true, "element": "#iframeArea"};
+    var previewInstance = $scope.getPreviewInstance();
+    confData.contentBody = previewInstance.getQuestionPreviwContent(data[$scope._constants.questionsetPlugin]);
+    ecEditor.dispatchEvent("atpreview:show", confData);
   };
+  $scope.resetPreview = function(){
+    var previewInstance = $scope.getPreviewInstance();
+    var confData = {"contentBody": {}, "parentElement": true, "element": "#iframeArea"};
+    confData.contentBody = previewInstance.resetPreview();
+    ecEditor.dispatchEvent("atpreview:show", confData);
+  }
   $scope.showPreview = function () {
   	$scope.refreshPreview = true;
   	if (!$scope.questionMetadataScreen) {
@@ -320,6 +330,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
             $scope.questionMetadataScreen = false;
             delete $scope.questionData.title;
             ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
+            $scope.resetPreview();
             $scope.$safeApply();
           } else {
             ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
