@@ -319,12 +319,15 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   $scope.saveQuestion = function (assessmentId, data) {
   	ecEditor.getService('assessment').saveQuestionV3(assessmentId, data, function (err, resp) {
   		if (!err) {
+        var emptyStage = {"theme":{"startStage":"splash","id":"theme","ver":0.3,"stage":[{"id":"splash","x":0,"y":0,"w":100,"h":100}],"manifest":{"media":[]},"plugin-manifest":{}}};
   			var qMetadata = $scope.qFormData.request.assessment_item.metadata;
           qMetadata.identifier = resp.data.result.node_id;
           if ($scope.isNewQuestion) {
             $scope.templatesScreen = true;
             $scope.questionMetadataScreen = false;
             delete $scope.questionData.title;
+            var confData = {"contentBody": emptyStage, "parentElement": true, "element": "#iframeArea"};
+            ecEditor.dispatchEvent("atpreview:show", confData);
             $scope.$safeApply();
           } else {
             ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
