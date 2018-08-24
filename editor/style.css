@@ -259,7 +259,7 @@ color: white;
 }
 
 .preview-heading {
-    padding: 15px 0;
+    padding: 0;
     width: 480px;
     margin: auto;
     text-align: left;
@@ -267,6 +267,27 @@ color: white;
 
 .formDiv{
     overflow: auto;
+}
+
+.activetemplate{
+    border-radius: 5px;
+    border: 1px solid rgba(34,36,38,.15);
+}
+
+.ui.grid.template-layout{
+    margin: 1rem 0;
+}
+
+.ui.grid.template-layout>.row{
+    padding: 0;
+}
+
+.ui.grid.template-layout>.row>.column{
+    padding: 1rem;
+}
+
+.select-template{
+    cursor: pointer;
 }
 
 .pull-left{
