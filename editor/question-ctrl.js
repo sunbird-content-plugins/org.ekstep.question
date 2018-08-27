@@ -66,17 +66,19 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     		var pluginManifest = org.ekstep.pluginframework.pluginManager.getPluginManifest(val.identifier);
     		var pluginID = val.identifier;
     		var ver = val.semanticVersion;
-    		if (!_.isUndefined(pluginManifest.templates)) {
+    		if(!_.isUndefined(pluginManifest)){
+          if (!_.isUndefined(pluginManifest.templates)) {
           _.each(pluginManifest.templates, function(v, k) { // eslint-disable-line no-unused-vars
-          	v.pluginID = pluginID;
-          	v.ver = ver;
-          	var thumbnail = val.appIcon;
-          	v.thumbnail1 = thumbnail;
-          	var allMenus = v;
-          	$scope.questionTemplates.push(allMenus);
+            v.pluginID = pluginID;
+            v.ver = ver;
+            var thumbnail = val.appIcon;
+            v.thumbnail1 = thumbnail;
+            var allMenus = v;
+            $scope.questionTemplates.push(allMenus);
           });
-        } else {
-        	$scope.templatesNotFound = "There are no templates available";
+          } else {
+            $scope.templatesNotFound = "There are no templates available";
+          }
         }
       }
     });
