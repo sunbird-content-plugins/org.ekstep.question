@@ -242,6 +242,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
             $scope.questionMetaData[property] = metaDataObject[property];
           }
         }
+        $scope.questionMetaData.level = 1;
         var questionFormData = {};
         var data = {}; // TODO: You have to get this from Q.Unit plugin(getData())
         data.plugin = $scope.selectedTemplatePluginData.plugin;
@@ -337,6 +338,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
             $scope.closeThisDialog();
           }
   		} else {
+        $scope.savingQuestion = false;
   			ecEditor.dispatchEvent("org.ekstep.toaster:error", {
   				title: 'Failed to save question...',
   				position: 'topCenter',
