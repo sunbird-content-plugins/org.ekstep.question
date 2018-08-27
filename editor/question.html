@@ -112,8 +112,9 @@
                                 Select layout <span class="star">&nbsp;*</span>
                             </label>
                             <select class="ui dropdown form-control" name="templateType"
-                                    ng-model="questionData.templateType" ng-change="updatePreview();"  ng-click="generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
-                                <option ng-repeat="tem in templatesType" value="{{tem}}">{{tem}}</option>
+                                    ng-model="questionData.templateType" ng-change="changeLayout(questionData.templateType)"  ng-click="generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
+                                <option  value="{{templatesType[0]}}">{{templatesType[0]}}</option>
+                                <option  value="{{templatesType[1]}}">{{templatesType[1]}}</option>
                             </select>
                         </div>
                         <div class="pull-left" ng-show="selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.sequence'">
@@ -121,7 +122,7 @@
                                 Select layout <span class="star">&nbsp;*</span>
                             </label>
                             <select class="ui dropdown form-control" name="templateType"
-                                    ng-model="questionData.templateType" ng-change="updatePreview();"  ng-click="generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
+                                    ng-model="questionData.templateType" ng-change="changeLayout(questionData.templateType)"  ng-click="generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
                                 <option  value="{{templatesType[0]}}">{{templatesType[0]}}</option>
                                 <option  value="{{templatesType[1]}}">{{templatesType[1]}}</option>
                             </select>
