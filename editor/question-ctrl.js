@@ -30,6 +30,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
         "name": template
       });
     });
+
     $scope.questionData.templateType = $scope.templatesType[0];
     $scope.questionMetaData = {};
 
