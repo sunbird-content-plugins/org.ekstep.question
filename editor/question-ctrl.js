@@ -244,7 +244,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
             $scope.questionMetaData[property] = metaDataObject[property];
           }
         }
-        $scope.questionMetaData.level = 1;
+        delete $scope.questionMetaData.level;
         var questionFormData = {};
         var data = {}; // TODO: You have to get this from Q.Unit plugin(getData())
         data.plugin = $scope.selectedTemplatePluginData.plugin;
