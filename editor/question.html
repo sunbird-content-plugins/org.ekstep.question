@@ -113,7 +113,7 @@
                             </label>
                             <div class="ui two column grid template-layout">
                                 <div class="row">
-                                    <div class="column" ng-class="{'activetemplate': questionData.templateType == templateIcon.name}" ng-repeat="templateIcon in seqTemplateIcons">
+                                    <div class="column" ng-class="{'activetemplate': questionData.templateType == templateIcon.name}" ng-repeat="templateIcon in templateIcons | limitTo : 2">
                                         <img class="ui centered tiny image select-template" src="{{templateIcon.icon}}" ng-click="changeLayout(templateIcon.name);"/>
                                     </div>
                                 </div>

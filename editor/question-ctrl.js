@@ -11,7 +11,6 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     $scope.templatesNotFound = '';
     $scope.selectedTemplatePluginData = {};
     $scope.templatesType = ['Horizontal', 'Vertical', 'Grid', 'Grid2', 'Vertical2'];
-    $scope.seqTemplateTypes = ['Horizontal', 'Vertical'];
     $scope._constants = {
       previewPlugin: 'org.ekstep.questionset.preview',
       questionPlugin: 'org.ekstep.question',
@@ -27,14 +26,6 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     _.each($scope.templatesType, function (template, key) {
       var templateIconName = template.toLowerCase();
       $scope.templateIcons.push({
-        "icon": ecEditor.resolvePluginResource(instance.manifest.id, instance.manifest.ver, 'assets/' + templateIconName + '.png'),
-        "name": template
-      });
-    });
-    $scope.seqTemplateIcons = [];
-    _.each($scope.seqTemplateTypes, function (template, key) {
-      var templateIconName = template.toLowerCase();
-      $scope.seqTemplateIcons.push({
         "icon": ecEditor.resolvePluginResource(instance.manifest.id, instance.manifest.ver, 'assets/' + templateIconName + '.png'),
         "name": template
       });
@@ -400,9 +391,6 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
       pluginInstance.renderForm(questionData1.data);
       $scope.$safeApply();
     };
-    $scope.setLayout = function(templateType){
-      $scope.questionData.templateType = templateType;
-    }
     $scope.changeLayout = function (templateType) {
       $scope.questionData.templateType = templateType;
       $scope.showPreview();
