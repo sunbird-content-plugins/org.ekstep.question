@@ -5,11 +5,12 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.Totalconcepts = 0;
 	$scope.Totaltopics = 0;
 	$scope.category = '';
-	$scope.editState = false;
+	$scope.editMode = false;
 	$scope.questionUnitTemplateURL = '';
 	$scope.questionTemplates = [];
 	$scope.templatesNotFound = '';
 	$scope.selectedTemplatePluginData = {};
+  $scope.savingQuestion = false;
 	$scope.templatesType = ['Horizontal', 'Vertical', 'Grid'];
 	$scope._constants = {
 		previewPlugin: 'org.ekstep.questionset.preview',
@@ -57,7 +58,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		$scope.templatesScreen = true;
 		$scope.questionMetadataScreen = false;
     var PluginsData = [];
-    ecEditor.dispatchEvent("org.ekstep.questionbank:getPlugins",function(pluginData){
+    ecEditor.dispatchEvent($scope._constants.questionsetPlugin + ":getPlugins",function(pluginData){
       PluginsData = pluginData;
     });
     _.each(PluginsData, function(val, key) { // eslint-disable-line no-unused-vars
@@ -65,17 +66,19 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     		var pluginManifest = org.ekstep.pluginframework.pluginManager.getPluginManifest(val.identifier);
     		var pluginID = val.identifier;
     		var ver = val.semanticVersion;
-    		if (!_.isUndefined(pluginManifest.templates)) {
+    		if(!_.isUndefined(pluginManifest)){
+          if (!_.isUndefined(pluginManifest.templates)) {
           _.each(pluginManifest.templates, function(v, k) { // eslint-disable-line no-unused-vars
-          	v.pluginID = pluginID;
-          	v.ver = ver;
-          	var thumbnail = val.appIcon;
-          	v.thumbnail1 = thumbnail;
-          	var allMenus = v;
-          	$scope.questionTemplates.push(allMenus);
+            v.pluginID = pluginID;
+            v.ver = ver;
+            var thumbnail = val.appIcon;
+            v.thumbnail1 = thumbnail;
+            var allMenus = v;
+            $scope.questionTemplates.push(allMenus);
           });
-        } else {
-        	$scope.templatesNotFound = "There are no templates available";
+          } else {
+            $scope.templatesNotFound = "There are no templates available";
+          }
         }
       }
     });
@@ -120,34 +123,44 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   		}
   	}
   }
+  $scope.getPreviewInstance = function(){
+    var pluginInstances = ecEditor.getPluginInstances();
+    var previewInstance = _.find(pluginInstances, function (pi) {
+      return pi.manifest.id === $scope._constants.previewPlugin
+    });
+    if (_.isUndefined(previewInstance)) {
+      previewInstance = $scope.createPluginInstance($scope._constants.previewPlugin);
+    }
+    return previewInstance;
+  }
   $scope.setPreviewData = function () {
-  	var confData = {};
-  	var qObj = {
-  		"config": '{"metadata":{"title":"question title","description":"question description","medium":"English"},"max_time":0,"max_score":1,"partial_scoring":' + $scope.questionData.isPartialScore + ',"isShuffleOption":' + $scope.questionData.isShuffleOption + ',"layout":' + JSON.stringify($scope.questionData.templateType) + '}',
-  		"data": JSON.stringify($scope.questionCreationFormData),
-  		"id": "c943d0a907274471a0572e593eab49c2",
-  		"pluginId": $scope.selectedTemplatePluginData.plugin.id,
-  		"pluginVer": $scope.selectedTemplatePluginData.plugin.version,
-  		"templateId": $scope.selectedTemplatePluginData.plugin.templateId,
-  		"type": "unit"
-  	}
-  	var questions = [];
-  	var data = {
-  		"org.ekstep.questionset": {}
-  	};
-  	questions.push(qObj);
-  	data[$scope._constants.questionsetPlugin][$scope._constants.questionPlugin] = questions;
-  	confData = {"contentBody": {}, "parentElement": true, "element": "#iframeArea"};
-  	var pluginInstances = ecEditor.getPluginInstances();
-  	var previewInstance = _.find(pluginInstances, function (pi) {
-  		return pi.manifest.id === $scope._constants.previewPlugin
-  	});
-  	if (_.isUndefined(previewInstance)) {
-  		previewInstance = $scope.createPluginInstance($scope._constants.previewPlugin);
-  	}
-  	confData.contentBody = previewInstance.getQuestionPreviwContent(data[$scope._constants.questionsetPlugin]);
-  	ecEditor.dispatchEvent("atpreview:show", confData);
+    var confData = {};
+    var qObj = {
+      "config": '{"metadata":{"title":"question title","description":"question description","medium":"English"},"max_time":0,"max_score":1,"partial_scoring":' + $scope.questionData.isPartialScore + ',"isShuffleOption":' + $scope.questionData.isShuffleOption + ',"layout":' + JSON.stringify($scope.questionData.templateType) + '}',
+      "data": JSON.stringify($scope.questionCreationFormData),
+      "id": "c943d0a907274471a0572e593eab49c2",
+      "pluginId": $scope.selectedTemplatePluginData.plugin.id,
+      "pluginVer": $scope.selectedTemplatePluginData.plugin.version,
+      "templateId": $scope.selectedTemplatePluginData.plugin.templateId,
+      "type": "unit"
+    }
+    var questions = [];
+    var data = {
+      "org.ekstep.questionset": {}
+    };
+    questions.push(qObj);
+    data[$scope._constants.questionsetPlugin][$scope._constants.questionPlugin] = questions;
+    confData = {"contentBody": {}, "parentElement": true, "element": "#iframeArea"};
+    var previewInstance = $scope.getPreviewInstance();
+    confData.contentBody = previewInstance.getQuestionPreviwContent(data[$scope._constants.questionsetPlugin]);
+    ecEditor.dispatchEvent("atpreview:show", confData);
   };
+  $scope.resetPreview = function(){
+    var previewInstance = $scope.getPreviewInstance();
+    var confData = {"contentBody": {}, "parentElement": true, "element": "#iframeArea"};
+    confData.contentBody = previewInstance.resetPreview();
+    ecEditor.dispatchEvent("atpreview:show", confData);
+  }
   $scope.showPreview = function () {
   	$scope.refreshPreview = true;
   	if (!$scope.questionMetadataScreen) {
@@ -184,9 +197,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	$scope.questionMetadataScreen = true;
     //comment because in edit question the question and question title are not
     if ($scope.category == 'FTB') {
-        $scope.questionData.title = _.isUndefined($scope.questionData.title) ? $scope.questionCreationFormData.question.text.replace(/\[\[.*?\]\]/g, '____') : $scope.questionData.title;
+        $scope.questionData.title = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text.replace(/\[\[.*?\]\]/g, '____') : $scope.questionData.questionTitle;
       } else {
-        $scope.questionData.title = _.isUndefined($scope.questionData.title) ? $scope.questionCreationFormData.question.text : $scope.questionData.title;
+        $scope.questionData.title = _.isUndefined($scope.questionData.questionTitle) ? $scope.questionCreationFormData.question.text : $scope.questionData.questionTitle;
       }
       $scope.questionData.title = $scope.extractHTML($scope.questionData.title);
 
@@ -225,11 +238,13 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     if(object.formData.target && object.formData.target.tempalteName && (object.formData.target.tempalteName.toLowerCase() == $scope._constants.metadataFormName.toLowerCase())){
      	if(object.isValid){
         var metaDataObject = object.formData.metaData;
+        _.extend(metaDataObject, {'title': metaDataObject.name, 'qlevel': metaDataObject.level});
         for (var property in object.formData.metaData) {
           if (metaDataObject[property]) {
             $scope.questionMetaData[property] = metaDataObject[property];
           }
         }
+        delete $scope.questionMetaData.level;
         var questionFormData = {};
         var data = {}; // TODO: You have to get this from Q.Unit plugin(getData())
         data.plugin = $scope.selectedTemplatePluginData.plugin;
@@ -254,7 +269,6 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
           "itemType": "UNIT",
           "version": 2,
           "category": $scope.category,
-          "description": $scope.questionMetaData.description,
           "createdBy": window.context.user.id,
           "channel": ecEditor.getContext('channel'),
           "type": $scope.category.toLowerCase(), // backward compatibility
@@ -263,17 +277,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
           "framework": ecEditor.getContext('framework')
         };
         for (var key in $scope.questionMetaData) {
-            if ($scope.questionMetaData.hasOwnProperty(key)) {
-              if (key == 'title') {
-              metadata['name'] = $scope.questionMetaData['title'];
-              }
-              if(key == 'level'){
-                metadata['qlevel'] = $scope.questionMetaData['level'];
-              }else{
-                metadata[key] = $scope.questionMetaData[key];
-              }
-            }
-          }
+          metadata[key] = $scope.questionMetaData[key];
+        }
         var dynamicOptions = [{"answer": true, "value": {"type": "text", "asset": "1"}}];
         var mtfoptions = [{
           "value": {
@@ -317,20 +322,25 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   }
   };
   $scope.saveQuestion = function (assessmentId, data) {
+    $scope.savingQuestion = true;
   	ecEditor.getService('assessment').saveQuestionV3(assessmentId, data, function (err, resp) {
   		if (!err) {
+        $scope.savingQuestion = false;
   			var qMetadata = $scope.qFormData.request.assessment_item.metadata;
           qMetadata.identifier = resp.data.result.node_id;
           if ($scope.isNewQuestion) {
             $scope.templatesScreen = true;
             $scope.questionMetadataScreen = false;
             delete $scope.questionData.title;
+            ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
+            $scope.resetPreview();
             $scope.$safeApply();
           } else {
             ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
             $scope.closeThisDialog();
           }
   		} else {
+        $scope.savingQuestion = false;
   			ecEditor.dispatchEvent("org.ekstep.toaster:error", {
   				title: 'Failed to save question...',
   				position: 'topCenter',
