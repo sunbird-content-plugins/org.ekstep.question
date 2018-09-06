@@ -11,7 +11,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.templatesNotFound = '';
 	$scope.selectedTemplatePluginData = {};
   $scope.savingQuestion = false;
-	$scope.templatesType = ['Horizontal', 'Vertical', 'Grid'];
+	$scope.templatesType = ['Horizontal', 'Vertical', 'Grid', 'Grid2', 'Vertical2'];
 	$scope._constants = {
 		previewPlugin: 'org.ekstep.questionset.preview',
 		questionPlugin: 'org.ekstep.question',
