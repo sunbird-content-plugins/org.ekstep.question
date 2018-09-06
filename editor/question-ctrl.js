@@ -58,7 +58,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		$scope.templatesScreen = true;
 		$scope.questionMetadataScreen = false;
     var PluginsData = [];
-    ecEditor.dispatchEvent("org.ekstep.questionbank:getPlugins",function(pluginData){
+    ecEditor.dispatchEvent($scope._constants.questionsetPlugin + ":getPlugins",function(pluginData){
       PluginsData = pluginData;
     });
     _.each(PluginsData, function(val, key) { // eslint-disable-line no-unused-vars
