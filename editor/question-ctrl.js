@@ -51,7 +51,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 			$scope.showTemplates();
 		}
 		
-    EventBus.listeners['editor:form:success'] = undefined;
+    //EventBus.listeners['editor:form:success'] = undefined;
     ecEditor.addEventListener('editor:form:success', $scope.saveMetaData);
 	}
 	$scope.showTemplates = function() {
