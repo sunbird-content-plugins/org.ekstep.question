@@ -13,6 +13,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   $scope.savingQuestion = false;
 	$scope.templatesType = ['Horizontal', 'Vertical', 'Grid'];
 	$scope._constants = {
+    formName: 'questionForm',
+    EVENT_FORM_SUCCESS: 'editor:form:success',
 		previewPlugin: 'org.ekstep.questionset.preview',
 		questionPlugin: 'org.ekstep.question',
 		questionsetPlugin: 'org.ekstep.questionset',
@@ -50,9 +52,17 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		} else {
 			$scope.showTemplates();
 		}
-		
-    //EventBus.listeners['editor:form:success'] = undefined;
-    ecEditor.addEventListener('editor:form:success', $scope.saveMetaData);
+
+    var formSuccessEvents = EventBus.listeners[$scope._constants.EVENT_FORM_SUCCESS];
+    _.each(formSuccessEvents, function(obj){
+      var eventScope = obj.scope;
+      if(eventScope && eventScope._constants && eventScope._constants.formName){
+        ecEditor.removeEventListener($scope._constants.EVENT_FORM_SUCCESS, obj.callback, eventScope);
+      }
+    });
+    ecEditor.addEventListener($scope._constants.EVENT_FORM_SUCCESS, $scope.saveMetaData, $scope);
+    
+    //EventBus.listeners['editor:form:success'].scope
 	}
 	$scope.showTemplates = function() {
 		$scope.templatesScreen = true;
