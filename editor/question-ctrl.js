@@ -60,9 +60,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
         ecEditor.removeEventListener($scope._constants.EVENT_FORM_SUCCESS, obj.callback, eventScope);
       }
     });
-    ecEditor.addEventListener($scope._constants.EVENT_FORM_SUCCESS, $scope.saveMetaData, $scope);
-    
-    //EventBus.listeners['editor:form:success'].scope
+    ecEditor.addEventListener($scope._constants.EVENT_FORM_SUCCESS, $scope.saveMetaData, $scope);  
 	}
 	$scope.showTemplates = function() {
 		$scope.templatesScreen = true;
