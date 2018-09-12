@@ -246,7 +246,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     if(object.formData.target && object.formData.target.tempalteName && (object.formData.target.tempalteName.toLowerCase() == $scope._constants.metadataFormName.toLowerCase())){
      	if(object.isValid){
         var metaDataObject = object.formData.metaData;
-        _.extend(metaDataObject, {'title': metaDataObject.name, 'qlevel': metaDataObject.level});
+        _.extend(metaDataObject, {'title': metaDataObject.name});
         for (var property in object.formData.metaData) {
           if (metaDataObject[property]) {
             $scope.questionMetaData[property] = metaDataObject[property];
@@ -366,7 +366,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	$scope.questionCreationFormData = questionData1.data.data;
   	$scope.questionData.medium = questionData1.data.config.metadata.medium;
   	$scope.questionData.questionTitle = questionData.title;
-  	$scope.questionData.level = questionData.qlevel;
+  	$scope.questionData.qlevel = questionData.qlevel || questionData.level;
   	$scope.questionData.subject = questionData1.data.config.metadata.subject;
   	$scope.questionData.board = questionData1.data.config.metadata.board;
   	$scope.questionData.templateType = questionData1.data.config.layout;
