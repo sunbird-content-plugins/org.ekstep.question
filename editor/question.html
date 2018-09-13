@@ -83,7 +83,7 @@
                         </div>
                         <div class="ui twelve column preview-heading">
                             <div class="qcMetadateFormLbl">
-                                Select layout<span class="star">&nbsp;*</span>
+                                Select layout
                             </div>
                             <div class="ui five column grid template-layout">
                                 <div class="row">
@@ -93,7 +93,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="preview-heading">
+                        <div class="preview-heading text-left">
                             <div class="ui label qb-toggle-label">Shuffle Option</div>
                             <div class="ui fluid toggle checkbox verticalcenter">
                                 <input type="checkbox" ng-model="questionData.isShuffleOption"
@@ -103,13 +103,13 @@
                         </div>
                     </div>
                     <div class="previewAreaHead"
-                         ng-show="selectedTemplatePluginData.plugin.id != 'org.ekstep.questionunit.mcq'">
+                         ng-show="selectedTemplatePluginData.plugin.id != 'org.ekstep.questionunit.mcq' && selectedTemplatePluginData.plugin.id != 'org.ekstep.questionunit.reorder'">
                         <div class="preview-heading">
-                            <h3 class="ui left floated previewHeading">Configuration</h3>
+                            <h3 class="ui center floated previewHeading">Configuration</h3>
                         </div>
                         <div ng-show="selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.sequence'">
                             <label class="qcMetadateFormLbl">
-                                Select layout <span class="star">&nbsp;*</span>
+                                Select layout
                             </label>
                             <div class="ui two column grid template-layout">
                                 <div class="row">
@@ -134,13 +134,13 @@
                         ng-click="cancel();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-cancel', ver: '', type: 'button'}})">
                     Cancel
                 </button>
-                <button class="ui basic primary button" id="back-button" ng-show="!templatesScreen" ng-disabled="setBackButtonState()"
+                <button class="ui basic primary button" id="back-button" ng-show="!templatesScreen" ng-disabled="editMode && !questionMetadataScreen"
                         ng-click="back();generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-back', ver: '', type: 'button'}})">
                     Back
                 </button>
                 <div class="or" ng-show="!templatesScreen && questionMetadataScreen"></div>
                 <button class="ui large blue button" ng-if="questionMetadataScreen" id="save-question-button"
-                        ng-click="sendMetaData(true);generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
+                        ng-click="sendMetaData(true);generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})" ng-disabled="savingQuestion">
                     Save and Create
                 </button>
                 <div class="or" ng-show="!templatesScreen"></div>
@@ -149,7 +149,7 @@
                     Next
                 </button>
                 <button class="ui large blue button" ng-if="questionMetadataScreen" id="save-question-button"
-                        ng-click="sendMetaData(false);generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})">
+                        ng-click="sendMetaData(false);generateTelemetry({type: 'TOUCH', id: 'button', target: {id: 'question-submit', ver: '', type: 'button'}})" ng-disabled="savingQuestion">
                     Submit
                 </button>
             </div>
