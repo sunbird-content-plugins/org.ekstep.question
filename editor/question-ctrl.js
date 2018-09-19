@@ -13,6 +13,8 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   $scope.savingQuestion = false;
 	$scope.templatesType = ['Horizontal', 'Vertical', 'Grid', 'Grid2', 'Vertical2'];
 	$scope._constants = {
+    formName: 'questionForm',
+    EVENT_FORM_SUCCESS: 'editor:form:success',
 		previewPlugin: 'org.ekstep.questionset.preview',
 		questionPlugin: 'org.ekstep.question',
 		questionsetPlugin: 'org.ekstep.questionset',
@@ -50,9 +52,15 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 		} else {
 			$scope.showTemplates();
 		}
-		
-    EventBus.listeners['editor:form:success'] = undefined;
-    ecEditor.addEventListener('editor:form:success', $scope.saveMetaData);
+
+    var formSuccessEvents = EventBus.listeners[$scope._constants.EVENT_FORM_SUCCESS];
+    _.each(formSuccessEvents, function(obj){
+      var eventScope = obj.scope;
+      if(eventScope && eventScope._constants && eventScope._constants.formName){
+        ecEditor.removeEventListener($scope._constants.EVENT_FORM_SUCCESS, obj.callback, eventScope);
+      }
+    });
+    ecEditor.addEventListener($scope._constants.EVENT_FORM_SUCCESS, $scope.saveMetaData, $scope);  
 	}
 	$scope.showTemplates = function() {
 		$scope.templatesScreen = true;
@@ -238,7 +246,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     if(object.formData.target && object.formData.target.tempalteName && (object.formData.target.tempalteName.toLowerCase() == $scope._constants.metadataFormName.toLowerCase())){
      	if(object.isValid){
         var metaDataObject = object.formData.metaData;
-        _.extend(metaDataObject, {'title': metaDataObject.name, 'qlevel': metaDataObject.level});
+        _.extend(metaDataObject, {'title': metaDataObject.name});
         for (var property in object.formData.metaData) {
           if (metaDataObject[property]) {
             $scope.questionMetaData[property] = metaDataObject[property];
@@ -358,7 +366,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	$scope.questionCreationFormData = questionData1.data.data;
   	$scope.questionData.medium = questionData1.data.config.metadata.medium;
   	$scope.questionData.questionTitle = questionData.title;
-  	$scope.questionData.level = questionData.qlevel;
+  	$scope.questionData.qlevel = questionData.qlevel || questionData.level;
   	$scope.questionData.subject = questionData1.data.config.metadata.subject;
   	$scope.questionData.board = questionData1.data.config.metadata.board;
   	$scope.questionData.templateType = questionData1.data.config.layout;
