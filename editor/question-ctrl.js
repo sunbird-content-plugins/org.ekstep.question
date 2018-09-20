@@ -337,6 +337,9 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   			var qMetadata = $scope.qFormData.request.assessment_item.metadata;
           qMetadata.identifier = resp.data.result.node_id;
           if ($scope.isNewQuestion) {
+            if($scope.questionTemplates.length == 0){
+                $scope.showTemplates();
+            }
             $scope.templatesScreen = true;
             $scope.questionMetadataScreen = false;
             delete $scope.questionData.title;
