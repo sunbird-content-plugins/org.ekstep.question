@@ -11,7 +11,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.templatesNotFound = '';
 	$scope.selectedTemplatePluginData = {};
   $scope.savingQuestion = false;
-	$scope.templatesType = ['Horizontal', 'Vertical', 'Grid'];
+	$scope.templatesType = ['Horizontal', 'Vertical', 'Grid', 'Grid2', 'Vertical2'];
 	$scope._constants = {
     formName: 'questionForm',
     EVENT_FORM_SUCCESS: 'editor:form:success',
@@ -63,35 +63,37 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     ecEditor.addEventListener($scope._constants.EVENT_FORM_SUCCESS, $scope.saveMetaData, $scope);  
 	}
 	$scope.showTemplates = function() {
-		$scope.templatesScreen = true;
-		$scope.questionMetadataScreen = false;
-    var PluginsData = [];
-    ecEditor.dispatchEvent($scope._constants.questionsetPlugin + ":getPlugins",function(pluginData){
-      PluginsData = pluginData;
-    });
-    _.each(PluginsData, function(val, key) { // eslint-disable-line no-unused-vars
-    	if (val.contentType == "Plugin") {
-    		var pluginManifest = org.ekstep.pluginframework.pluginManager.getPluginManifest(val.identifier);
-    		var pluginID = val.identifier;
-    		var ver = val.semanticVersion;
-    		if(!_.isUndefined(pluginManifest)){
-          if (!_.isUndefined(pluginManifest.templates)) {
-          _.each(pluginManifest.templates, function(v, k) { // eslint-disable-line no-unused-vars
-            v.pluginID = pluginID;
-            v.ver = ver;
-            var thumbnail = val.appIcon;
-            v.thumbnail1 = thumbnail;
-            var allMenus = v;
-            $scope.questionTemplates.push(allMenus);
-          });
-          } else {
-            $scope.templatesNotFound = "There are no templates available";
+    $scope.templatesScreen = true;
+    $scope.questionMetadataScreen = false;
+    if ($scope.questionTemplates.length == 0) {
+      var PluginsData = [];
+      ecEditor.dispatchEvent($scope._constants.questionsetPlugin + ":getPlugins", function(pluginData) {
+        PluginsData = pluginData;
+      });
+      _.each(PluginsData, function(val, key) { // eslint-disable-line no-unused-vars
+        if (val.contentType == "Plugin") {
+          var pluginManifest = org.ekstep.pluginframework.pluginManager.getPluginManifest(val.identifier);
+          var pluginID = val.identifier;
+          var ver = val.semanticVersion;
+          if (!_.isUndefined(pluginManifest)) {
+            if (!_.isUndefined(pluginManifest.templates)) {
+              _.each(pluginManifest.templates, function(v, k) { // eslint-disable-line no-unused-vars
+                v.pluginID = pluginID;
+                v.ver = ver;
+                var thumbnail = val.appIcon;
+                v.thumbnail1 = thumbnail;
+                var allMenus = v;
+                $scope.questionTemplates.push(allMenus);
+              });
+            } else {
+              $scope.templatesNotFound = "There are no templates available";
+            }
           }
         }
-      }
-    });
-    $scope.$safeApply();
-	}
+      });
+      $scope.$safeApply();
+    }
+  }
 	$scope.showQuestionUnitForm = function (obj) {
 		$scope.category = obj.category;
 		$scope.templatesScreen = false;
@@ -183,7 +185,6 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   $scope.back = function () {
   	if(!$scope.questionMetadataScreen) {
   		$scope.questionMetadataScreen = true;
-  		$scope.templatesScreen = true;
   		$scope.showTemplates();
   	} else {
   		var metaFormScope = $('#question-meta-form #content-meta-form').scope();
@@ -337,7 +338,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   			var qMetadata = $scope.qFormData.request.assessment_item.metadata;
           qMetadata.identifier = resp.data.result.node_id;
           if ($scope.isNewQuestion) {
-            $scope.templatesScreen = true;
+            $scope.showTemplates();
             $scope.questionMetadataScreen = false;
             delete $scope.questionData.title;
             ecEditor.dispatchEvent($scope._constants.questionbankPlugin + ':saveQuestion', qMetadata);
