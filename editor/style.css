@@ -302,3 +302,10 @@ color: white;
 .text-left{
     text-align:left;
 }
+
+.template-warning-Message{
+    margin-top: 1%;
+    position: absolute; 
+    width: 80%;
+    font-size: 11px;
+}

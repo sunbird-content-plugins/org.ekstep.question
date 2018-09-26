@@ -65,6 +65,11 @@
                     </div>
                 </div>
                 <div class="five wide column previewArea" ng-show="!templatesScreen">
+                    <div class="template-warning-Message" ng-show="templateChanged">
+                       <div class="ui yellow message">
+                            <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please check preview before saving. Entire question might not fit in the layout selected.</p>
+                        </div>
+                    </div>
                     <div class="previewAreaHead">
                         <div class="preview-heading">
                             <h3 class="ui left floated previewHeading">Preview</h3>
