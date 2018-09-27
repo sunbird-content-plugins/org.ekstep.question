@@ -391,9 +391,10 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	$scope.conceptsCheck = true;
   	$scope.topicsCheck = true;
   	var pluginID = questionData1.data.plugin.id;
-  	var pluginVer = questionData1.data.plugin.version;
   	var pluginTemplateId = questionData1.data.plugin.templateId;
   	var editCreateQuestionFormInstance = org.ekstep.pluginframework.pluginManager.getPluginManifest(questionData1.data.plugin.id);
+    // version will load based on the plugin load
+    var pluginVer = editCreateQuestionFormInstance.ver;
     _.each(editCreateQuestionFormInstance.templates, function (value, key) { // eslint-disable-line no-unused-vars
     	if (value.editor.template == questionData1.data.plugin.templateId) {
     		var templatePathEdit = ecEditor.resolvePluginResource(pluginID, pluginVer, value.editor.templateURL);
