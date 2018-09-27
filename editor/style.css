@@ -262,7 +262,6 @@ color: white;
 .preview-heading {
     padding: 0;
     width: 480px;
-    margin: auto;
     text-align: center;
 }
 
@@ -304,8 +303,11 @@ color: white;
 }
 
 .template-warning-Message{
-    margin-top: 1%;
-    position: absolute; 
-    width: 80%;
+    position: absolute;
+    width: 480px;
     font-size: 11px;
+    margin-bottom: 15px;
+}
+.qc-show-preview{
+    margin-top: 15px;
 }
