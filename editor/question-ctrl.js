@@ -146,7 +146,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   $scope.setPreviewData = function () {
     var confData = {};
     var qObj = {
-      "config": '{"metadata":{"title":"question title","description":"question description","medium":"English"},"max_time":0,"max_score":1,"partial_scoring":' + $scope.questionData.isPartialScore + ',"isShuffleOption":' + $scope.questionData.isShuffleOption + ',"layout":' + JSON.stringify($scope.questionData.templateType) + '}',
+      "config": '{"metadata":{"title":"question title","description":"question description","medium":"English"},"max_time":0,"max_score":' + $scope.questionData.questionMaxScore + ',"partial_scoring":' + $scope.questionData.isPartialScore + ',"isShuffleOption":' + $scope.questionData.isShuffleOption + ',"layout":' + JSON.stringify($scope.questionData.templateType) + '}',
       "data": JSON.stringify($scope.questionCreationFormData),
       "id": "c943d0a907274471a0572e593eab49c2",
       "pluginId": $scope.selectedTemplatePluginData.plugin.id,
@@ -386,7 +386,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     $scope.selectedConceptsData = questionData1.data.config.metadata.concepts;
   	$scope.selectedTopicsData = questionData.topic;
   	$scope.questionData.questionDesc = questionData1.data.config.metadata.description;
-  	$scope.questionData.max_score = questionData1.data.config.metadata.max_score;
+  	$scope.questionData.questionMaxScore = questionData1.data.config.metadata.max_score;
   	$scope.conceptsCheck = true;
   	$scope.topicsCheck = true;
   	var pluginID = questionData1.data.plugin.id;
