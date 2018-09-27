@@ -11,6 +11,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
 	$scope.templatesNotFound = '';
 	$scope.selectedTemplatePluginData = {};
   $scope.savingQuestion = false;
+  $scope.templateChanged = false;
 	$scope.templatesType = ['Horizontal', 'Vertical', 'Grid', 'Grid2', 'Vertical2'];
 	$scope._constants = {
     formName: 'questionForm',
@@ -411,8 +412,13 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     $scope.$safeApply();
   };
   $scope.changeLayout = function(templateType){
-    $scope.questionData.templateType = templateType;
-    $scope.showPreview();
+    if($scope.questionData.templateType != templateType){
+      $scope.questionData.templateType = templateType;
+      $scope.showPreview();
+      $scope.templateChanged = true;
+      $('.template-warning-Message').fadeIn(1000);
+      $('.template-warning-Message').delay(5000).fadeOut(5000);
+    }
   }
   $scope.extractHTML = function(htmlElement) {
   	var divElement= document.createElement('div');
