@@ -23,7 +23,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
     formElementId: '#questionMetaDataTemplate',
     metadataFormName: 'questionMetaDataTemplate'
 	};
-	$scope.questionData = {'questionMaxScore': 1};
+	$scope.questionData = {'max_score': 1};
 	$scope.questionData.isShuffleOption = false;
 	$scope.questionData.isPartialScore = true;
   $scope.templateIcons = [];
@@ -147,7 +147,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   $scope.setPreviewData = function () {
     var confData = {};
     var qObj = {
-      "config": '{"metadata":{"title":"question title","description":"question description","medium":"English"},"max_time":0,"max_score":1,"partial_scoring":' + $scope.questionData.isPartialScore + ',"isShuffleOption":' + $scope.questionData.isShuffleOption + ',"layout":' + JSON.stringify($scope.questionData.templateType) + '}',
+      "config": '{"metadata":{"title":"question title","description":"question description","medium":"English"},"max_time":0,"max_score":' + $scope.questionData.max_score + ',"partial_scoring":' + $scope.questionData.isPartialScore + ',"isShuffleOption":' + $scope.questionData.isShuffleOption + ',"layout":' + JSON.stringify($scope.questionData.templateType) + '}',
       "data": JSON.stringify($scope.questionCreationFormData),
       "id": "c943d0a907274471a0572e593eab49c2",
       "pluginId": $scope.selectedTemplatePluginData.plugin.id,
@@ -269,7 +269,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
         var metadataObj = $scope.questionMetaData;    
         metadataObj.category = $scope.category;
         // TODO: questionCount should be sent from unit template controllers. Currently it is hardcoded to 1.
-        data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.questionMaxScore, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": 1};
+        data.config = { "metadata": metadataObj, "max_time": 0, "max_score": $scope.questionData.max_score, "partial_scoring": $scope.questionData.isPartialScore, "layout": $scope.questionData.templateType, "isShuffleOption" : $scope.questionData.isShuffleOption, "questionCount": 1};
         data.media = $scope.questionCreationFormData.media;
         questionFormData.data = data;
         var metadata = {
