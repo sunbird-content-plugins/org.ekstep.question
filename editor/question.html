@@ -83,9 +83,9 @@
                         </div>
                         <div class="ui twelve column preview-heading">
                             <div class="qcMetadateFormLbl">
-                                Select layout<span class="star">&nbsp;*</span>
+                                Select layout
                             </div>
-                            <div class="ui three column grid template-layout">
+                            <div class="ui five column grid template-layout">
                                 <div class="row">
                                     <div class="column" ng-class="{'activetemplate': questionData.templateType == templateIcon.name}" ng-repeat="templateIcon in templateIcons">
                                         <img class="ui centered tiny image select-template" src="{{templateIcon.icon}}" ng-click="changeLayout(templateIcon.name);"/>
@@ -93,7 +93,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="preview-heading">
+                        <div class="preview-heading text-left">
                             <div class="ui label qb-toggle-label">Shuffle Option</div>
                             <div class="ui fluid toggle checkbox verticalcenter">
                                 <input type="checkbox" ng-model="questionData.isShuffleOption"
@@ -103,18 +103,21 @@
                         </div>
                     </div>
                     <div class="previewAreaHead"
-                         ng-show="selectedTemplatePluginData.plugin.id != 'org.ekstep.questionunit.mcq'">
+                         ng-show="selectedTemplatePluginData.plugin.id != 'org.ekstep.questionunit.mcq' && selectedTemplatePluginData.plugin.id != 'org.ekstep.questionunit.reorder'">
                         <div class="preview-heading">
-                            <h3 class="ui left floated previewHeading">Configuration</h3>
+                            <h3 class="ui center floated previewHeading">Configuration</h3>
                         </div>
-                        <div class="pull-left" ng-show="selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.mtf'">
-                            <label class="qcMetadateFormLbl pull-left">
-                                Select layout <span class="star">&nbsp;*</span>
+                        <div ng-show="selectedTemplatePluginData.plugin.id == 'org.ekstep.questionunit.sequence'">
+                            <label class="qcMetadateFormLbl">
+                                Select layout
                             </label>
-                            <select class="ui dropdown form-control" name="templateType"
-                                    ng-model="questionData.templateType" ng-change="updatePreview();"  ng-click="generateTelemetry({type: 'TOUCH', id: 'select', target: {id: 'question-layout', ver: '', type: 'select'}})" required>
-                                <option ng-repeat="tem in templatesType" value="{{tem}}">{{tem}}</option>
-                            </select>
+                            <div class="ui two column grid template-layout">
+                                <div class="row">
+                                    <div class="column" ng-class="{'activetemplate': questionData.templateType == templateIcon.name}" ng-repeat="templateIcon in templateIcons | limitTo : 2">
+                                        <img class="ui centered tiny image select-template" src="{{templateIcon.icon}}" ng-click="changeLayout(templateIcon.name);"/>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="ui label qb-toggle-label">Partial Scoring</div>
                         <div class="ui fluid toggle checkbox verticalcenter">
