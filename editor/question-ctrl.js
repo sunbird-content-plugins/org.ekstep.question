@@ -366,7 +366,7 @@ angular.module('org.ekstep.question', ['org.ekstep.metadataform'])
   	$scope.questionMetadataScreen = false;
   	$scope.editMode = true;
   	var questionData1 = typeof questionData.body == "string" ? JSON.parse(questionData.body) : questionData.body;
-  	$scope.assessmentId = questionData.identifier;
+  	$scope.assessmentId = questionData.framework == ecEditor.getContext('framework') ? questionData.identifier : undefined;
   	$scope.questionData = questionData1;
   	$scope.questionCreationFormData = questionData1.data.data;
   	$scope.questionData.medium = questionData1.data.config.metadata.medium;
